@@ -1,2 +1,5 @@
-lens : 	1 	23	25	10	0	10
+source:	0	10	20
+	source	x	y
+
+lens : 	2 	23	25	10	0	10
 	lens	x	y	length	deg_0	focus
