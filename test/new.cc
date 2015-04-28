@@ -4,49 +4,65 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <signal.h>
+#include <stdlib.h>
 
-int main() {
-  int h = socket(PF_INET, SOCK_STREAM, 0);
-  if (h < 0) {
-    perror("creating socket");
-  }
-  const int PORT = 5678;
-  struct sockaddr_in local;
-  // inet_aton(
-  local.sin_family = PF_INET;
-  local.sin_port = htons(PORT);
-  if (bind(h, (sockaddr *)&local, sizeof local) < 0) {
-    perror("bind");
-	close(h);
-	return 1;
-  }
-  if (listen(h, 10) < 0) {
-    perror("listen"); close(h); return 2;
-  }
-  for (;;) {
-	char buf[512] = "";
-	int connect_socket;
-	struct sockaddr_in remote;
-	unsigned remoteLen = sizeof remote;
-	connect_socket = accept(h, (sockaddr *)&remote, &remoteLen);
-	printf("Accepted!\n");
-//	char buf[512];
-	int rd;
-//	while((rd = read(connect_socket, buf, sizeof(buf)-1)) > 0) {
-		rd = read(connect_socket, buf, sizeof buf);
-        	buf[rd]='\0';    // explicit null termination: updated based on comments
-        	printf("%s\n",buf); // print the current receive buffer with a newline
-        	fflush(stdout);         // make sure everything makes it to the output
-        	buf[0]='\0';        // clear the buffer : I am 99% sure this is not needed now
-    //	}
-//	int rd = read(connect_socket, buf, sizeof buf);
-//	printf("read %d bytes '%s'\n", rd, buf);
-	close(connect_socket);
-//	if (buf[0] == 'F') {
-//	  printf("FINISH\n");
-//	  break;
-//	}
-  }
-  close(h);
+int h;
+int cs;
+
+void handler(int nsig)
+{
+    if(nsig==SIGINT)
+    {
+        close(cs);
+        close(h);
+        printf("Shutting down\n");
+        exit(0);
+    }
 }
-  
+
+int main() 
+{
+    (void)signal(SIGINT, handler);
+    h = socket(PF_INET, SOCK_STREAM, 0);
+    char buf[512];
+    if (h < 0) 
+    {
+        perror("Creating socket");
+    }
+    const int PORT = 5678;
+    struct sockaddr_in local;
+    local.sin_family = PF_INET;
+    local.sin_port = htons(PORT);
+    if(bind(h, (sockaddr *)&local, sizeof(local)) < 0) 
+    {
+        perror("Binding");
+        close(h);
+        return 1;
+    }
+    if (listen(h, 10) < 0) 
+    {
+        perror("Listening"); 
+        close(h); 
+        return 2;
+    }
+    struct sockaddr_in remote;
+    unsigned remoteLen=sizeof(remote);
+    if((cs=accept(h, (sockaddr *)&remote, &remoteLen))<0)
+    {
+        perror("Accepting");
+        return 3;
+    }
+    int rd;
+    sendto(cs, "1", 1, 0, (sockaddr *)&remote, remoteLen);
+    while((rd=recvfrom(cs, buf, sizeof(buf), 0, (sockaddr *)&remote, &remoteLen))>0)
+    {
+        buf[rd]=0;
+        printf("%s\n", buf);
+        fflush(stdout);
+        buf[0]=0;
+        sendto(cs, "1", 1, 0, (sockaddr *)&remote, remoteLen);
+    }
+    close(cs);
+    close(h);
+}  
