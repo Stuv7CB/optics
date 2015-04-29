@@ -6,7 +6,9 @@
 #include <arpa/inet.h>
 #include <signal.h>
 #include <stdlib.h>
-#include "device.h"
+//#include "ray.h"    //was included in "device.h"
+//#include "device.h" //was included in "sort.h"
+#include "sort.h"
 
 int h;
 int cs;
@@ -74,8 +76,26 @@ int main()
                                 sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &l, &deg, &f);
                                 Device  *d = new Lens(x, y, l, deg, f);
                                 my_device.push_back(d);
-                                printf("New lens was created\n");
+                                printf("New lens f>0 was created\n");
                                 break;
+				}
+			case 3:	//lens f<0
+				{
+                                float a1, x, y, l, deg, f;
+                                sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &l, &deg, &f);
+//                                Device  *d = new Lens(x, y, l, deg, f);
+//                                my_device.push_back(d);
+                                printf("New lens f<0 was created\n");
+				break;
+				}
+			case 4:	//ploskoparallell plastinka
+				{
+                                float a1, x, y, len, wid, n;
+                                sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &len, &wid, &n);
+//                                Device  *d = new Lens(x, y, l, deg, f);
+//                                my_device.push_back(d);
+                                printf("New ploskoparallell plastinka was created\n");
+				break;
 				}
                         case 5: //Laser
                                 {
@@ -85,6 +105,33 @@ int main()
 				printf("New laser was created\n");
                                 break;
                                 }
+			case 6:	//sphere mirror
+				{
+                                float a1, x, y, r, deg1, deg2;
+                                sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &r, &deg1, &deg2);
+//                                Device  *d = new Lens(x, y, l, deg, f);
+//                                my_device.push_back(d);
+                                printf("New sphere mirror was created\n");
+				break;
+				}
+			case 7:	//mirror
+				{
+                                float a1, x, y, deg;
+                                sscanf(buf, "%f %f %f %f",&a1,&x, &y, &deg);
+//                                Device  *d = new Lens(x, y, l, deg, f);
+//                                my_device.push_back(d);
+                                printf("New mirror was created\n");
+				break;
+				}
+			case 8:	//triangle prism
+				{
+                                float a1, x1, y1, x2, y2, x3, y3, n;
+                                sscanf(buf, "%f %f %f %f %f %f %f %f",&a1,&x1, &y1, &x2, &y2, &x3, &y3, &n);
+//                                Device  *d = new Lens(x, y, l, deg, f);
+//                                my_device.push_back(d);
+                                printf("New triangle prism was created\n");
+				break;
+				}
                 }
 		
         	fflush(stdout);
@@ -97,10 +144,49 @@ int main()
 //Запускаем проверку для выходного луча. Пересечет ли он экран? Если да, то в какой точке????. 
 //После нахождения каждой из точек отправляем Лене запись. write(wr, "точка1, точка 2", 3).
 
-//	Here we need to sort by x
-		
+//	Here we need to sort vector my_device by x
+	sort_(my_device);	
 
 
+ 	point *cross = NULL;
+	int k = 0; //номер девайса
+	bool q = false; //true, если пересечения есть
+	char buf_[32];
+//let's work with laser first
+	while (k < my_device.size()){
+		for (int i = k; i < my_device.size(); i++){	
+			//cross device;
+			cross = my_device[i]-> cross_point(my_laser->ray);
+			if (cross != NULL){
+				sprintf(buf_, "%f %f %f %f %c", my_laser->ray->x, my_laser->ray->y, cross->x, cross->y, '\0');//new dot
+				sendto (cs, buf_, 15, 0, (sockaddr *)&remote, remoteLen);
+				k = i + 1;
+				q = true;
+				my_laser->ray->x = cross->x;
+				my_laser->ray->y = cross->y;
+				break;
+			}
+		}
+		if (q == false){
+			break;
+		}
+	}
+	//cross screen
+	cross = NULL;
+	cross = my_screen->cross_point(my_laser->ray);
+	if (cross != NULL){
+		sprintf(buf_, "%f %f %f %f %c", my_laser->ray->x, my_laser->ray->y, cross->x, cross->y, '\0');
+		sendto(cs, buf_, 15, 0, (sockaddr *)&remote, remoteLen);
+	}
+	else{
+		//find граница, куда дойдет луч
+//		sprintf(buf_, "%f %f", );
+//		sprintf(buf_, "\0");		
+		sendto(cs, buf_, 15, 0, (sockaddr *)&remote, remoteLen);
+	}
+
+
+/*
         point *cross = NULL;
 	char bu[512];
 	sprintf("%f %f ", my_laser->ray->x, my_laser->ray->y);
@@ -130,7 +216,7 @@ int main()
 //      	printf("%s\n", bu);
         	sendto(cs, bu, 10, 0, (sockaddr *)&remote, remoteLen);
         }
-
+*/
 //	bu = "";
     	close(cs);
     	close(h);
