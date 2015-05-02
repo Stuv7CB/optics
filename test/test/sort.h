@@ -13,7 +13,7 @@ void print_(vector <Device *> my_device){
 	printf("\n");
 }
 void sort_(vector <Device *> my_device){
-	print_(my_device);
+//	print_(my_device);
 
 	for (int i = 0; i < my_device.size()-1; i++){
 		for (int j = i+1; j < my_device.size(); j++){
@@ -25,7 +25,7 @@ void sort_(vector <Device *> my_device){
 		}
 	}	
 
-	print_(my_device);
+//	print_(my_device);
 }
 /*int main(){
         vector <Device *> my_device;
