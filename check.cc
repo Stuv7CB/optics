@@ -9,7 +9,6 @@
 //#include "ray.h"    //was included in "device.h"
 //#include "device.h" //was included in "sort.h"
 #include "sort.h"
-#include <string.h>
 
 int h;
 int cs;
@@ -31,7 +30,7 @@ int main()
     	if (h < 0){
         	perror("Creating socket");
     	}
-    	const int PORT = 5678;
+    	const int PORT = 5555;
     	struct sockaddr_in local;
     	local.sin_family = PF_INET;
     	local.sin_port = htons(PORT);
@@ -136,60 +135,17 @@ int main()
                 }
 		
         	fflush(stdout);
-		if (strcmp(buf, "FINISH\0")!=0{
         	buf[0]=0;
         	sendto(cs, "1", 1, 0, (sockaddr *)&remote, remoteLen);
-		}
-		else{
-			break;
-		}
     	}
-//	Let's imagine we have done it
-//first: пробегаем весь отсортированный массив девайсов. Первое пересечение -> break. Пусть пересекло первым второй девайс
-//Тогда запускаем новый пробег for 3 to n. И так далее пока не дошли до конца. Если мы успешно прошли весь цикл или сделали брейк на энтом, то
-//Запускаем проверку для выходного луча. Пересечет ли он экран? Если да, то в какой точке????. 
-//После нахождения каждой из точек отправляем Лене запись. write(wr, "точка1, точка 2", 3).
 
-//	Here we need to sort vector my_device by x
-	sort_(my_device);	
+	char buf_[64];
+	float f1, f2, f3, f4;
+	f1 = 10; f2 = 20; f3 = 30; f4 = 40;
+	sprintf(buf_, "%f %f %f %f %c", f1, f2, f3, f4, '\0');
+	printf("We try to send %s\n", buf_);
+	sendto(cs, buf_, 10, 0,(sockaddr *)&remote, remoteLen);
 
-
- 	point *cross = NULL;
-	int k = 0; //номер девайса
-	bool q = false; //true, если пересечения есть
-	char buf_[32];
-//let's work with laser first
-	while (k < my_device.size()){
-		for (int i = k; i < my_device.size(); i++){	
-			//cross device;
-			cross = my_device[i]-> cross_point(my_laser->ray);
-			if (cross != NULL){
-				sprintf(buf_, "%f %f %f %f %c", my_laser->ray->x, my_laser->ray->y, cross->x, cross->y, '\0');//new dot
-				sendto (cs, buf_, strlen(buf_)+1, 0, (sockaddr *)&remote, remoteLen);
-				k = i + 1;
-				q = true;
-				my_laser->ray->x = cross->x;
-				my_laser->ray->y = cross->y;
-				break;
-			}
-		}
-		if (q == false){
-			break;
-		}
-	}
-	//cross screen
-	cross = NULL;
-	cross = my_screen->cross_point(my_laser->ray);
-	if (cross != NULL){
-		sprintf(buf_, "%f %f %f %f %c", my_laser->ray->x, my_laser->ray->y, cross->x, cross->y, '\0');
-		sendto(cs, buf_, strlen(buf_)+1, 0, (sockaddr *)&remote, remoteLen);
-	}
-	else{
-		//find граница, куда дойдет луч
-//		sprintf(buf_, "%f %f", );
-//		sprintf(buf_, "\0");		
-		sendto(cs, buf_, strlen(buf_)+1, 0, (sockaddr *)&remote, remoteLen);
-	}
     	close(cs);
     	close(h);
 }  
