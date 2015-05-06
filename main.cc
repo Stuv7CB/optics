@@ -51,7 +51,6 @@ int main()
     	unsigned remoteLen=sizeof(remote);
     	if((cs=accept(h, (sockaddr *)&remote, &remoteLen))<0){
         	perror("Accepting");
-        	return 3;
     	}
     	int rd;
         vector <Device*> my_device;
@@ -77,20 +76,22 @@ int main()
                                 {
                                 float a1, x, y, l, deg, f;
                                 sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &l, &deg, &f);
+                                printf("%lf\n", f);
                                 Device  *d = new Lens(x, y, l, deg, f);
                                 my_device.push_back(d);
                                 printf("New lens f>0 was created\n");
                                 break;
 				}
-			case 3:	//lens f<0
+/*			case 3:	//lens f<0
 				{
                                 float a1, x, y, l, deg, f;
                                 sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &l, &deg, &f);
-//                                Device  *d = new Lens(x, y, l, deg, f);
-//                                my_device.push_back(d);
+                                printf("%lf", f);
+                                Device  *d = new Lens(x, y, l, deg, f);
+                                my_device.push_back(d);
                                 printf("New lens f<0 was created\n");
 				break;
-				}
+				}*/
 			case 4:	//ploskoparallell plastinka
 				{
                                 float a1, x, y, len, wid, n;
@@ -108,7 +109,7 @@ int main()
 				printf("New laser was created\n");
                                 break;
                                 }
-			case 6:	//sphere mirror
+			case 7:	//sphere mirror
 				{
                                 float a1, x, y, r, deg1, deg2;
                                 sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &r, &deg1, &deg2);
@@ -117,7 +118,7 @@ int main()
                                 printf("New sphere mirror was created\n");
 				break;
 				}
-			case 7:	//mirror
+			case 3:	//mirror
 				{
                                 float a1, x, y, deg;
                                 sscanf(buf, "%f %f %f %f",&a1,&x, &y, &deg);
@@ -126,7 +127,7 @@ int main()
                                 printf("New mirror was created\n");
 				break;
 				}
-			case 8:	//triangle prism
+			case 6:	//triangle prism
 				{
                                 float a1, x1, y1, x2, y2, x3, y3, n;
                                 sscanf(buf, "%f %f %f %f %f %f %f %f",&a1,&x1, &y1, &x2, &y2, &x3, &y3, &n);
@@ -177,7 +178,6 @@ RAY *my_laser_ray=my_laser->rays_create();
 				/*my_laser_ray->x = cross->x;
 				my_laser_ray->y = cross->y;*/
                 my_device[i]->change_direction(my_laser_ray, cross);
-                printf("%lf\n", my_laser_ray->deg);
 				break;
 			}
 		}
