@@ -45,6 +45,8 @@ int main()
         	close(h); 
         	return 2;
     	}
+        while(1)
+        {
     	struct sockaddr_in remote;
     	unsigned remoteLen=sizeof(remote);
     	if((cs=accept(h, (sockaddr *)&remote, &remoteLen))<0){
@@ -54,7 +56,7 @@ int main()
     	int rd;
         vector <Device*> my_device;
         SCREEN *my_screen;
-        Laser *my_laser;
+        LASER *my_laser;
 
     	sendto(cs, "1", 1, 0, (sockaddr *)&remote, remoteLen);
     	while((rd=recvfrom(cs, buf, sizeof(buf), 0, (sockaddr *)&remote, &remoteLen))>0){
@@ -102,7 +104,7 @@ int main()
                                 {
                                 float a1, x, y, deg;
                                 sscanf(buf, "%f %f %f %f", &a1,&x, &y, &deg);
-                                my_laser = new Laser(x, y, deg);
+                                my_laser = new LASER(x, y, deg);
 				printf("New laser was created\n");
                                 break;
                                 }
@@ -136,7 +138,7 @@ int main()
                 }
 		
         	fflush(stdout);
-		if (strcmp(buf, "FINISH\0")!=0{
+		if (strcmp(buf, "FINISH\0")!=0){
         	buf[0]=0;
         	sendto(cs, "1", 1, 0, (sockaddr *)&remote, remoteLen);
 		}
@@ -158,18 +160,24 @@ int main()
 	int k = 0; //номер девайса
 	bool q = false; //true, если пересечения есть
 	char buf_[32];
+    char temp[1];
+RAY *my_laser_ray=my_laser->rays_create();
+
 //let's work with laser first
 	while (k < my_device.size()){
 		for (int i = k; i < my_device.size(); i++){	
 			//cross device;
-			cross = my_device[i]-> cross_point(my_laser->ray);
+            			cross = my_device[i]-> cross_point(my_laser_ray);
 			if (cross != NULL){
-				sprintf(buf_, "%f %f %f %f %c", my_laser->ray->x, my_laser->ray->y, cross->x, cross->y, '\0');//new dot
+				sprintf(buf_, "%f %f %f %f %c", my_laser_ray->x, my_laser_ray->y, cross->x, cross->y, '\0');//new dot
 				sendto (cs, buf_, strlen(buf_)+1, 0, (sockaddr *)&remote, remoteLen);
+                recv(cs, temp, 1, 0);
 				k = i + 1;
 				q = true;
-				my_laser->ray->x = cross->x;
-				my_laser->ray->y = cross->y;
+				/*my_laser_ray->x = cross->x;
+				my_laser_ray->y = cross->y;*/
+                my_device[i]->change_direction(my_laser_ray, cross);
+                printf("%lf\n", my_laser_ray->deg);
 				break;
 			}
 		}
@@ -179,17 +187,22 @@ int main()
 	}
 	//cross screen
 	cross = NULL;
-	cross = my_screen->cross_point(my_laser->ray);
+	cross = my_screen->cross_point(my_laser_ray);
 	if (cross != NULL){
-		sprintf(buf_, "%f %f %f %f %c", my_laser->ray->x, my_laser->ray->y, cross->x, cross->y, '\0');
+		sprintf(buf_, "%f %f %f %f %c", my_laser_ray->x, my_laser_ray->y, cross->x, cross->y, '\0');
 		sendto(cs, buf_, strlen(buf_)+1, 0, (sockaddr *)&remote, remoteLen);
+        recv(cs, temp, 1, 0);
 	}
 	else{
 		//find граница, куда дойдет луч
 //		sprintf(buf_, "%f %f", );
 //		sprintf(buf_, "\0");		
 		sendto(cs, buf_, strlen(buf_)+1, 0, (sockaddr *)&remote, remoteLen);
+recv(cs, temp, 1, 0);
 	}
+    send(cs, "FINISH\0", 7, 0);
+    while(recv(cs, buf_, sizeof(buf_)+1, 0)>0);
     	close(cs);
+        }
     	close(h);
 }  
