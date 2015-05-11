@@ -8,7 +8,7 @@
 #include <stdlib.h>
 //#include "ray.h"    //was included in "device.h"
 //#include "device.h" //was included in "sort.h"
-#include "sort.h"
+#include "./sort.h"
 #include <string.h>
 #include <pthread.h>
 
@@ -205,10 +205,11 @@ int cs=*(int *)arg;
             my_laser_ray.push_back(rt[j]);
         }
     }
-
 //let's work with laser first
 for(int I=0; I<my_laser_ray.size(); I++)
 {
+    cross=NULL;
+    k=0;
 	while (k < my_device.size()){
 		for (int i = k; i < my_device.size(); i++){	
 			//cross device;
@@ -239,10 +240,12 @@ for(int I=0; I<my_laser_ray.size(); I++)
                     }
                     recv(cs, temp, 1, 0);
                 }
+                printf("I: %d; k: %d; i: %d.\n",I, k, i);
 				break;
 			}
 		}
 		if (q == false){
+            printf("%d\n",I);
 			break;
 		}
 	}
