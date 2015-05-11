@@ -56,26 +56,35 @@ class Device{
 public:
     float x1, x2, y1, y2, deg, f ;      // y1 - up y2 - down x1 - left x2 - right
     virtual void change_direction(RAY * r, point * p) const = 0;
-    virtual const char *getID() const = 0;
+    //virtual const char *getID() const = 0;
+    virtual int getID()
+    {
+        return -1;
+    }
     virtual point * cross_point (RAY * r) const = 0;
 };
 
 class Disc : public Device{     // n > 1 !!!
 public:
-    float  w, n, x3,y3, x4, y4; // w - width
+    float  w,l,n, x3,y3, x4, y4; // w - width
     
 public:
-    Disc ( float x, float y, float l, float w_0, float n_0){
-        x1 = x  ;
-        x2 = x  ;
-        x3 = x + w;
-        x4 =x3;
-        y1 = y - (float)(l/2) ;
-        y2 = y + (float)(l/2) ;
+    Disc ( float x, float y, float l_0, float w_0, float n_0){
+        x1 = x - (float)w_0 / 2 ;
+        x2 = x - (float)w_0 / 2;
+        x3 = x + (float)w_0 / 2;
+        x4 = x + (float)w_0 / 2;
+        y1 = y - (float)(l_0/2) ;
+        y2 = y + (float)(l_0/2) ;
         y3 = y1;
         y4 = y2;
         w = w_0;
+        l = l_0;
         n = n_0;
+    }
+    int getID()
+    {
+        return 4;
     }
     point * cross_point (RAY * r) const {
         point * p = new point  ();
@@ -86,7 +95,11 @@ public:
             p->x = (float)det_1/det;
             p->y = (float)det_2/det;
             if (( p->x >= x1 ) && ( p->x <= x2 ) && ( p->y >= y1 ) && ( p->y <= y2 ))
+            {
+        //        r->x=p->x;
+        //        r->y=p->y;
                 return p;
+            }
         }
         if ((orient (this->x3,this->y3,this->x4,this->y4,r->x,r->y,1) > 0) && ((r->deg >= 90) && (r->deg <= 270))) {
             float det = this->y2 - this->y1 - tan (r->deg * PI / 180) * (this->x3 - this->x4);
@@ -95,86 +108,212 @@ public:
             p->x = (float)det_1/det;
             p->y = (float)det_2/det;
             if (( p->x >= x3 ) && ( p->x <= x4 ) && ( p->y >= y1 ) && ( p->y <= y2 ))
+{
+          //      r->x=p->x;
+          //      r->y=p->y;
                 return p;
+            }
         }
+        
+        if ((orient (this->x1,this->y1,this->x3,this->y3,r->x,r->y,1) > 0) && ((r->deg >= 180) && (r->deg <= 360))) {
+            //cout << "this->y1 = "<<  this->y1 << "\n";
+            float det = this->x3 - this->x1 - (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180) * (this->y1 - this->y3);
+            //cout << "det = " << det << "\n";
+            float det_1 = this->x3 * this->y1 - this->x1 * this->y3 - (this->y1 - this->y3) * (r->x +  (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180) * r->y);
+            //cout << "det_1 = " << det_1 << "\n";
+            float det_2 = (this->x3 - this->x1) * (r->x +  (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180) * r->y) - (this->x3 * this->y1 - this->x1 * this->y3) *  (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180);
+            cout << "det_2 = " << det_2 << "\n";
+            p->x = (float)det_1/det;
+            p->y = (float)det_2/det;
+            float t = p->y;
+            p->y = p->x;
+            p->x = t;
+            //cout << "p->x = " << p->x << "\n";
+            //cout << "p->y = " << p->y << "\n";
+            if (( p->x >= x1 ) && ( p->x <= x3 ) && ( p->y >= y1 ) && ( p->y <= y3 ))
+{
+          //      r->x=p->x;
+          //      r->y=p->y;
+                return p;
+            }
+        }
+        
+        if ((orient (this->x2,this->y2,this->x4,this->y4,r->x,r->y,1) < 0) && ((r->deg >= 0) && (r->deg <= 180))) {
+            
+            float det = this->x4 - this->x2 - (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180) * (this->y2 - this->y4);
+            float det_1 = this->x4 * this->y2 - this->x2 * this->y4 - (this->y2 - this->y4) * (r->x +  (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180) * r->y);
+            float det_2 = (this->x4 - this->x2) * (r->x +  (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180) * r->y) - (this->x4 * this->y2 - this->x2 * this->y4) *  (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180);
+            p->x = (float)det_1/det;
+            p->y = (float)det_2/det;
+            float t = p->y;
+            p->y = p->x;
+            p->x = t;
+            if (( p->x >= x2 ) && ( p->x <= x4 ) && ( p->y >= y2 ) && ( p->y <= y4 ))
+{
+         //       r->x=p->x;
+         //       r->y=p->y;
+                return p;
+            }
+        }
+        
         
         
         return NULL;
     }
-
+    
     
     void change_direction(RAY * r, point * p ) const {
         point * new_p = p;
         float deg = 0;
-        float beta = asin (fabs (sin (r->deg * PI / 180) / this->n) )* 180 / PI;
-        
-        if ((fabs((this->y1 - p->y)) * tan ((90-beta) * PI / 180)) >= this->w) {
-            if (r->x < p->x){
-                if (r->y >= p->y)  {
-                    new_p->x = p->x + this->w;
-                    new_p->y = p->y - this->w * tan ( beta * PI / 180);
+        if ((r->y <= this->y2) && (r->y >= this->y1)) {
+            float beta = asin (fabs (sin (r->deg * PI / 180) / this->n) )* 180 / PI;
+            if ((((fabs((this->y1 - p->y)) * tan ((90-beta) * PI / 180)) >= this->w) && (r->y >= p->y)) || (((fabs((this->y2 - p->y)) * tan ((90-beta) * PI / 180)) >= this->w) && (r->y <= p->y))) {
+                if (r->x < p->x){
+                    if (r->y >= p->y)  {
+                        new_p->x = p->x + this->w;
+                        new_p->y = p->y - this->w * tan ( beta * PI / 180);
+                    }
+                    else {
+                        beta = fabs (beta);
+                        new_p->x = p->x + this->w;
+                        new_p->y = p->y + this->w * tan ( beta * PI / 180);
+                    }
                 }
+                
                 else {
-                    beta = fabs (beta);
-                    new_p->x = p->x + this->w;
-                    new_p->y = p->y + this->w * tan ( beta * PI / 180);
+                    if (r->y >= p->y)  {
+                        new_p->x = p->x - this->w;
+                        new_p->y = p->y - this->w * tan ( beta * PI / 180);
+                    }
+                    else {
+                        beta = fabs (beta);
+                        new_p->x = p->x - this->w;
+                        new_p->y = p->y + this->w * tan ( beta * PI / 180);
+                    }
                 }
+                deg = r->deg;
             }
-            
             else {
-                if (r->y >= p->y)  {
-                    new_p->x = p->x - this->w;
-                    new_p->y = p->y - this->w * tan ( beta * PI / 180);
+                //cout << "yes \n" ;
+                if (r->x < p->x){
+                    if (r->y >= p->y)  {
+                        new_p->x = p->x + fabs((this->y1 - p->y)) * tan ((90-beta) * PI / 180);
+                        new_p->y = this->y1;
+                        if ((cos (beta * PI / 180) * this->n) <= 1)
+                            deg = 90 - asin (cos (beta * PI / 180) * this->n) * 180 / PI;
+                        else
+                            deg = 0;
+                    }
+                    else {
+                        beta = fabs (beta);
+                        new_p->x = p->x + fabs((this->y2 - p->y)) * tan ((90-beta) * PI / 180);
+                        new_p->y = this->y2;
+                        if ((cos (beta * PI / 180) * this->n) <= 1)
+                            deg = 270 + asin (cos (beta * PI / 180) * this->n) * 180 / PI;
+                        else
+                            deg = 360;
+                    }
                 }
+                
                 else {
-                    beta = fabs (beta);
-                    new_p->x = p->x - this->w;
-                    new_p->y = p->y + this->w * tan ( beta * PI / 180);
+                    if (r->y >= p->y)  {
+                        new_p->x = p->x - fabs((this->y1 - p->y)) * tan ((90-beta) * PI / 180);
+                        new_p->y = this->y1;
+                        if ((cos (beta * PI / 180) * this->n) <= 1)
+                            deg = 90 + asin (cos (beta * PI / 180) * this->n) * 180 / PI;
+                        else
+                            deg = 180;
+                    }
+                    else {
+                        beta = fabs (beta);
+                        new_p->x = p->x - fabs((this->y2 - p->y)) * tan ((90-beta) * PI / 180);
+                        new_p->y = this->y2;
+                        if ((cos (beta * PI / 180) * this->n) <= 1)
+                            deg = 270 - asin (cos (beta * PI / 180) * this->n) * 180 / PI;
+                        else
+                            deg = 180;
+                    }
                 }
             }
-            deg = r->deg;
         }
         else {
-            //cout << "yes \n" ;
-            if (r->x < p->x){
-                if (r->y >= p->y)  {
-                    new_p->x = p->x + fabs((this->y1 - p->y)) * tan ((90-beta) * PI / 180);
-                    new_p->y = this->y1;
-                    deg = 90 - asin (sin (beta * PI / 180) * this->n) * 180 / PI;
+            float beta = asin (fabs (cos (r->deg * PI / 180) / this->n) )* 180 / PI;
+            if ((((fabs((this->x1 - p->x)) * tan ((90-beta) * PI / 180)) >= this->l) && (r->x >= p->x)) || (((fabs((this->x3 - p->x)) * tan ((90-beta) * PI / 180)) >= this->l) && (r->x <= p->x))) {
+                float beta = asin (fabs (cos (r->deg * PI / 180) / this->n) )* 180 / PI;
+                if (r->y < p->y){
+                    if (r->x >= p->x)  {
+                        new_p->y = p->y + this->l;
+                        new_p->x = p->x - this->l * tan ( beta * PI / 180);
+                    }
+                    else {
+                        beta = fabs (beta);
+                        new_p->y = p->y + this->l;
+                        new_p->x = p->x + this->l * tan ( beta * PI / 180);
+                    }
                 }
+                
                 else {
-                    beta = fabs (beta);
-                    new_p->x = p->x + fabs((this->y2 - p->y)) * tan ((90-beta) * PI / 180);
-                    new_p->y = this->y2;
-                    deg = 270 + asin (sin (beta * PI / 180) * this->n) * 180 / PI;
-                    //cout << " deg = " << deg << "\n";
+                    if (r->x >= p->x)  {
+                        new_p->y = p->y - this->l;
+                        new_p->x = p->x - this->l * tan ( beta * PI / 180);
+                    }
+                    else {
+                        beta = fabs (beta);
+                        new_p->y = p->y - this->l;
+                        new_p->x = p->x + this->l * tan ( beta * PI / 180);
+                    }
                 }
+                deg = r->deg;
             }
-            
             else {
-                if (r->y >= p->y)  {
-                    new_p->x = p->x - fabs((this->y1 - p->y)) * tan ((90-beta) * PI / 180);
-                    new_p->y = this->y1;
-                    deg = 90 + asin (sin (beta * PI / 180) * this->n) * 180 / PI;
+                //cout << "yes \n" ;
+                if (r->y < p->y){
+                    if (r->x >= p->x)  {
+                        new_p->y = p->y + fabs((this->x1 - p->x)) * tan ((90-beta) * PI / 180);
+                        new_p->x = this->x1;
+                        if ((cos (beta * PI / 180) * this->n) <= 1)
+                            deg = 180 + asin (cos (beta * PI / 180) * this->n) * 180 / PI;
+                        else
+                            deg = 270;
+                    }
+                    else {
+                        beta = fabs (beta);
+                        new_p->y = p->y + fabs((this->x3 - p->x)) * tan ((90-beta) * PI / 180);
+                        new_p->x = this->x3;
+                        if ((cos (beta * PI / 180) * this->n) <= 1)
+                            deg = 360 - asin (cos (beta * PI / 180) * this->n) * 180 / PI;
+                        else
+                            deg = 270;
+                    }
                 }
+                // HERE YOU STOPPED
                 else {
-                    beta = fabs (beta);
-                    new_p->x = p->x - fabs((this->y2 - p->y)) * tan ((90-beta) * PI / 180);
-                    new_p->y = this->y2;
-                    deg = 270 - asin (sin (beta * PI / 180) * this->n) * 180 / PI;
+                    if (r->x >= p->x)  {
+                        new_p->y = p->y - fabs((this->x1 - p->x)) * tan ((90-beta) * PI / 180);
+                        new_p->x = this->x1;
+                        if ((cos (beta * PI / 180) * this->n) <= 1)
+                            deg = 180 - asin (cos (beta * PI / 180) * this->n) * 180 / PI;
+                        else
+                            deg = 90;
+                    }
+                    else {
+                        beta = fabs (beta);
+                        new_p->y = p->y - fabs((this->x3 - p->x)) * tan ((90-beta) * PI / 180);
+                        new_p->x = this->x3;
+                        if ((cos (beta * PI / 180) * this->n) <= 1)
+                            deg = asin (cos (beta * PI / 180) * this->n) * 180 / PI;
+                        else
+                            deg = 90;
+                    }
                 }
             }
-            
         }
         //cout << "beta = " << beta << "\n";
         r->x = new_p->x;
         r->y = new_p->y;
         r->deg = deg;
     }
-
-    const char *getID() const{
-        return "Disc";
-    }
+    
     
     ~Disc ()
     {
@@ -183,6 +322,7 @@ public:
     
     
 };
+
 
 
 class Lens_ras : public Device{
@@ -620,14 +760,15 @@ public:
     { }
     void source_pos()
     { cout << " x = " << x << " y = " << y  << "\n";}
-    RAY * rays_create ()
+    RAY** rays_create ()
     {   const int num_of_rays = NUMBER;
         float deg_step = (float)360 / (num_of_rays - 1);
-        RAY * ray = new RAY [num_of_rays];
+        RAY ** ray = new RAY *[num_of_rays];
         float deg_i = 0;
         for (int i = 0; i < num_of_rays; i++) {
-            ray[i].set_ray_pos (x, y, deg_i);
-            ray[i].show_ray_pos(i);
+            ray[i]=new RAY();
+            ray[i]->set_ray_pos (x, y, deg_i);
+            ray[i]->show_ray_pos(i);
             deg_i = deg_i + deg_step;
         }
         return ray;
@@ -637,75 +778,3 @@ public:
         cout << "Destructure of the source" << "\n";
     }
 };
-
-
-
-
-/*int main ()
-{
-    vector <Device *> my_device;
-    
-    Device * d_1 = new Lens (50, 100 , 100,  0 , 50);
-    my_device.push_back(d_1 );
-    
-    Device * d_2 = new Lens (125, 100 , 100,  0 , 100);
-    my_device.push_back(d_2 );
-    
-    //Device * d_3 = new Lens_ras (100, 400 , 100,  50 , 2);
-    //my_device.push_back(d_3 );
-    
-    
-    
-    SCREEN * my_screen = new SCREEN (130, 100, 100, 0);
-    //my_screen->screen_pos();
-    //SOURCE my_source (0, 100);
-    LASER my_laser (0, 100, 15);
-    RAY * my_laser_ray = my_laser.rays_create();
-    //RAY * my_rays = my_source.rays_create ();
-    
-    point * cross = NULL;
-    // LASER
-       for (int i =0; i < 2; i++) {
-        cross = my_device[i]->cross_point (  my_laser_ray );
-        if ( cross != NULL ) {
-            cout << "laser_ray crossed device " << i << " at the point x = " << cross->x << " y = " << cross->y << "\n";
-            cout << "prev r->x = " <<  my_laser_ray->x  << "\n"<< "prev r->y = " <<  my_laser_ray->y << " \n prev r->deg = " <<  my_laser_ray->deg  << "\n" ;
-            my_device[i]->change_direction(   my_laser_ray,  cross);
-            cout << " new r->x = " << my_laser_ray->x << " \n" << " new r->y = " << my_laser_ray->y << " \n new r->deg = " <<  my_laser_ray->deg << " \n" ;
-        }
-        
-    }
-       cross = my_screen->cross_point (  my_laser_ray );
-    if ( cross != NULL ) {
-        cout << "laser_ray crossed screen " << " at the point x = " << cross->x << " y = " << cross->y << "\n";
-    }
-    
-    // SOURCE
-    for ( int j = 0; j < NUMBER; j++ ){
-        cross = my_screen->cross_point ( & my_rays[j] );
-        if ( cross != NULL ) {
-            cout << "ray " << j << " crossed screen " << " at the point x = " << cross->x << " y = " << cross->y << "\n";
-        }
-    }
-
-    for ( int j = 1; j < 2; j++ ) {
-        for (int i = 0; i < my_device.size(); i++) {
-             cross = my_device[i]->cross_point ( & my_rays[j] );
-             if ( cross != NULL ) {
-                cout << "ray " << j << " crossed device " << i << " at the point x = " << cross->x << " y = " << cross->y << "\n";
-                 cout << "prev r->x = " <<  my_rays[j].x  << "\n"<< "prev r->y = " <<  my_rays[j].y  << "\n" ;
-                 my_device[i]->change_direction(  & my_rays[j],  cross);
-                 cout << " new r->x = " << my_rays[j].x << " \n" << " new r->y = " << my_rays[j].y << " \n" ;
-            
-
-             }
-        }
-        if (cross == NULL) {
-            cout << "ray number " << j << " did not cross devices "<< "\n";
-        }
-    }
-
-    delete [] my_rays;
-    return 0;
-}*/
-
