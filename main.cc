@@ -122,7 +122,7 @@ int cs=*(int *)arg;
 				{
                                 float a1, x, y, len, wid, n;
                                 sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &len, &wid, &n);
-                                Device  *d = new Disc(x, y, len, wid, n);
+                                Device  *d = new Disc(x, y, len, wid, 0, n);
                                 my_device.push_back(d);
                                 printf("New ploskoparallell plastinka was created\n");
 				break;
