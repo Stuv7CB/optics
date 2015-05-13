@@ -899,6 +899,67 @@ public:
         cout << "Destructure of the Lens" << "\n";
     }
 };
+//1) Плоское зеркало (XY – координаты; lenght – длина зеркала; deg_0 – угол поворота).
+class PlainRefl :       public Device {
+        public:
+    float deg, f;
+
+public:
+    PlainRefl( float x, float y, float l, float deg_0){       //deg from vertical 0 <= deg <= 90  against hour ;
+        x1 = x - (float)(l/2) * sin (GradToRad(deg_0)) ;
+        x2 = x + (float)(l/2) * sin (GradToRad(deg_0));
+        y1 = y - (float)(l/2) * cos (GradToRad(deg_0));
+        y2 = y + (float)(l/2) * cos (GradToRad(deg_0));
+        deg = deg_0;
+                std::cout << "Create PlainRefl (" << x1 << ", " << y1 << "), (" << x2 << ", " << y2 << ") deg: " << deg << "\n";
+    }
+    point *cross_point(RAY *r) const {
+        point *p = new point();
+        if ((( this->x1 + this->x2 )/2 > r->x) && ((r->deg <= 90) || (r->deg > 270))){
+            float det = this->y2 - this->y1 - tan (GradToRad(r->deg)) * (this->x1 - this->x2);
+            float det_1 = this->y2 * this->x1
+                                - this->y1 * this->x2
+                                - (this->x1 - this->x2) * (r->y + tan (GradToRad(r->deg)) * r->x);
+            float det_2 = (this->y2 - this->y1) * (r->y + tan (GradToRad(r->deg)) * r->x)
+                                - (this->y2 * this->x1 - this->y1 * this->x2) * tan (GradToRad(r->deg));
+            p->x = (float)det_1/det;
+            p->y = (float)det_2/det;
+            if ((( p->x >= x1 ) && ( p->x <= x2 ) && (x1 <= x2)) && (( p->y >= y1 ) && ( p->y <= y2 ) && (y1 <= y2))) return p;
+            if ((( p->x <= x1 ) && ( p->x >= x2 ) && (x1 >= x2)) && (( p->y >= y1 ) && ( p->y <= y2 ) && (y1 <= y2))) return p;
+            if ((( p->x >= x1 ) && ( p->x <= x2 ) && (x1 <= x2)) && (( p->y <= y1 ) && ( p->y >= y2 ) && (y1 >= y2))) return p;
+            if ((( p->x <= x1 ) && ( p->x >= x2 ) && (x1 >= x2)) && (( p->y <= y1 ) && ( p->y >= y2 ) && (y1 >= y2))) return p;
+        }
+        if ((( this->x1 + this->x2 )/2 < r->x) && ((r->deg >= 90) && (r->deg <= 270))) {
+            float det = this->y2 - this->y1 - tan (GradToRad(r->deg)) * (this->x1 - this->x2);
+            float det_1 = this->y2 * this->x1 - this->y1 * this->x2 - (this->x1 - this->x2) * (r->y + tan (GradToRad(r->deg)) * r->x);
+            float det_2 = (this->y2 - this->y1) * (r->y + tan (GradToRad(r->deg)) * r->x)
+                                - (this->y2 * this->x1 - this->y1 * this->x2) * tan (GradToRad(r->deg));
+            p->x = (float)det_1/det;
+            p->y = (float)det_2/det;
+            if ((( p->x >= x1 ) && ( p->x <= x2 ) && (x1 <= x2)) && (( p->y >= y1 ) && ( p->y <= y2 ) && (y1 <= y2))) return p;
+            if ((( p->x <= x1 ) && ( p->x >= x2 ) && (x1 >= x2)) && (( p->y >= y1 ) && ( p->y <= y2 ) && (y1 <= y2))) return p;
+            if ((( p->x >= x1 ) && ( p->x <= x2 ) && (x1 <= x2)) && (( p->y <= y1 ) && ( p->y >= y2 ) && (y1 >= y2))) return p;
+            if ((( p->x <= x1 ) && ( p->x >= x2 ) && (x1 >= x2)) && (( p->y <= y1 ) && ( p->y >= y2 ) && (y1 >= y2))) return p;
+        }
+        return NULL;
+    }
+
+    void change_direction(RAY *r, point *p) const                       //      Плоское зеркало
+    {
+                r->deg = (90 + this->deg) * 2 - r->deg;
+
+                r->deg = r->Deg360(r->deg);
+    }
+    const char *getID() const {
+        return "PlainRefl";
+    }
+
+    ~PlainRefl ()
+    {
+        cout << "Destructure of the PlainRefl" << "\n";
+    }
+};
+
 
 //2) Сферическое зеркало (
 //      XY – координаты; 
