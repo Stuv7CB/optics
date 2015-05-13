@@ -118,12 +118,12 @@ int cs=*(int *)arg;
                                 printf("New lens f>0 was created\n");
                                 break;
 				}
-                        case 3: //mirror
+                        case 3: //mirror == PlainRefl
                                 {
                                 float a1, x, y, l, deg;
                                 sscanf(buf, "%f %f %f %f %f",&a1,&x, &y, &l, &deg);
-//                                Device  *d = new PlainRefl(x, y, l, deg);
-//                                my_device.push_back(d);
+                                Device  *d = new PlainRefl(x, y, l, deg);
+                                my_device.push_back(d);
                                 printf("New mirror was created\n");
                                 break;
                                 }
