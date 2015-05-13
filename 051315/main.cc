@@ -68,6 +68,7 @@ int cs=*(int *)arg;
 	char buf_[32];
 
         vector <Device*> my_device;
+
         SCREEN *my_screen;
         vector<LASER*> my_laser;
         vector<SOURCE*> my_source;
@@ -278,7 +279,7 @@ for(int I=0; I<my_laser_ray.size(); I++)
 	}
 	else{
 		//find граница, куда дойдет луч
-//		sprintf(buf_, "%f %f", );
+		sprintf(buf_, "%f %f %f %f %c", 100, 100, 100, 100, 0);
 //		sprintf(buf_, "\0");		
 		if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
