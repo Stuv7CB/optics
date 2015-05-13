@@ -70,22 +70,38 @@ public:
     
 public:
     Disc ( float x, float y, float l_0, float w_0, float deg_0, float n_0){
-        x1 = x - (float)(l_0/2) * sin (deg_0 * PI / 180) - (float) w_0 / 2 * cos (deg_0 * PI / 180) ;
-        x2 = x + (float)(l_0/2) * sin (deg_0 * PI / 180) - (float) w_0 / 2 * cos (deg_0 * PI / 180) ;
-        y1 = y - (float)(l_0/2) * cos (deg_0 * PI / 180) + (float) w_0 / 2 * sin (deg_0 * PI / 180) ;
-        y2 = y + (float)(l_0/2) * cos (deg_0 * PI / 180) + (float) w_0 / 2 * sin (deg_0 * PI / 180) ;
+        float x_1 = x - (float)(l_0/2) * sin (deg_0 * PI / 180) - (float) w_0 / 2 * cos (deg_0 * PI / 180) ;
+        float x_2 = x + (float)(l_0/2) * sin (deg_0 * PI / 180) - (float) w_0 / 2 * cos (deg_0 * PI / 180) ;
+        float y_1 = y - (float)(l_0/2) * cos (deg_0 * PI / 180) + (float) w_0 / 2 * sin (deg_0 * PI / 180) ;
+        float y_2 = y + (float)(l_0/2) * cos (deg_0 * PI / 180) + (float) w_0 / 2 * sin (deg_0 * PI / 180) ;
         
-        x3 = x1 + (float)(w_0) * cos (deg_0 * PI / 180);
-        x4 = x2 + (float)(w_0) * cos (deg_0 * PI / 180);
-        y3 = y1 - (float)(w_0) * sin (deg_0 * PI / 180);
-        y4 = y2 - (float)(w_0) * sin (deg_0 * PI / 180);
+        float x_3 = x_1 + (float)(w_0) * cos (deg_0 * PI / 180);
+        float x_4 = x_2 + (float)(w_0) * cos (deg_0 * PI / 180);
+        float y_3 = y_1 - (float)(w_0) * sin (deg_0 * PI / 180);
+        float y_4 = y_2 - (float)(w_0) * sin (deg_0 * PI / 180);
         
         deg = deg_0;
         w = w_0;
         l = l_0;
         n = n_0;
         
-       // cout << x1<<" " << x2 <<" "<< x3 <<" "<< x4 <<" "<< y1 <<" "<< y2<<" " << y3 <<" "<< y4 << "\n";
+        x1 = x_1 * cos (deg * PI / 180) - y_1 * sin (deg * PI / 180);
+        x2 = x_2 * cos (deg * PI / 180) - y_2 * sin (deg * PI / 180);
+        x3 = x_3 * cos (deg * PI / 180) - y_3 * sin (deg * PI / 180);
+        x4 = x_4 * cos (deg * PI / 180) - y_4 * sin (deg * PI / 180);
+        
+        
+        y1 = x_1 * sin (deg * PI / 180) + y_1 * cos (deg * PI / 180);
+        y2 = x_2 * sin (deg * PI / 180) + y_2 * cos (deg * PI / 180);
+        y3 = x_3 * sin (deg * PI / 180) + y_3 * cos (deg * PI / 180);
+        y4 = x_4 * sin (deg * PI / 180) + y_4 * cos (deg * PI / 180);
+        
+        
+        cout << "x_1 = " << x_1 << " x_2 = " << x_2 << " x_3 = " << x_3 << " x_4 = " << x_4 << " y_1 = " << y_1 << " y_2 = " << y_2 << " y_3 = " << y_3 << " y_4 = " << y_4 << "\n";
+
+        cout << "x1 = " << x1 << " x2 = " << x2 << " x3 = " << x3 << " x4 = " << x4 << " y1 = " << y1 << " y2 = " << y2 << " y3 = " << y3 << " y4 = " << y4 << "\n";
+        
+        
 
     }
     int getID()
@@ -93,17 +109,50 @@ public:
         return 4;
     }
     point * cross_point (RAY * r) const {
+
         point * p = new point  ();
+        float p_x, p_y;
+        float r_x, r_y;
+        r_x = r->x;
+        r_y = r->y;
+        r->x = r_x * cos (this->deg * PI / 180) - r_y * sin (this->deg * PI / 180);
+        r->y = r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+        if (r->deg >= this->deg)
+            r->deg = r->deg - this->deg;
+        else
+            r->deg = 360 + r->deg -this->deg;
+        cout << "r->x = " << r->x << " r->y = " << r->y << " r->deg = " << r->deg << "\n";
+
+        
+        
         if ((orient (this->x1,this->y1,this->x2,this->y2,r->x,r->y,1) < 0) && ((r->deg <= 90) || (r->deg >= 270))) {
+            cout << "h_0\n";
             float det = this->y2 - this->y1 - tan (r->deg * PI / 180) * (this->x1 - this->x2);
+            cout << "det = " << det << "\n";
             float det_1 = this->y2 * this->x1 - this->y1 * this->x2 - (this->x1 - this->x2) * (r->y + tan (r->deg * PI / 180) * r->x);
+            cout << "det_1 = " << det_1 << "\n";
+
             float det_2 = (this->y2 - this->y1) * (r->y + tan (r->deg * PI / 180) * r->x) - (this->y2 * this->x1 - this->y1 * this->x2) * tan (r->deg * PI / 180);
+            cout << "det_2 = " << det_2 << "\n";
+
+            
             p->x = (float)det_1/det;
             p->y = (float)det_2/det;
-            if (( p->x >= x1 ) && ( p->x <= x2 ) && ( p->y >= y1 ) && ( p->y <= y2 ))
+            
+            cout << "p->x = " << p->x << " p->y = " << p->y << "\n";
+            cout << "x1 = " << x1 << " x2 = " << x2 << " y1 = " << y1 << " y2 = " << y2  << "\n";
+
+
+            if ( ( p->y >= y1 ) && ( p->y <= y2 ))
             {
-                //        r->x=p->x;
-                //        r->y=p->y;
+                p_x = p->x;
+                p_y = p->y;
+                p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
+                p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                r_x = r->x;
+                r_y = r->y;
+                r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
+                r->y = -r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
                 return p;
             }
         }
@@ -113,10 +162,16 @@ public:
             float det_2 = (this->y2 - this->y1) * (r->y + tan (r->deg * PI / 180) * r->x) - (this->y2 * this->x3 - this->y1 * this->x4) * tan (r->deg * PI / 180);
             p->x = (float)det_1/det;
             p->y = (float)det_2/det;
-            if (( p->x >= x3 ) && ( p->x <= x4 ) && ( p->y >= y1 ) && ( p->y <= y2 ))
+            if (( p->y >= y1 ) && ( p->y <= y2 ))
             {
-                //      r->x=p->x;
-                //      r->y=p->y;
+                p_x = p->x;
+                p_y = p->y;
+                p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
+                p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                r_x = r->x;
+                r_y = r->y;
+                r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
+                r->y = -r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
                 return p;
             }
         }
@@ -136,10 +191,16 @@ public:
             p->x = t;
             //cout << "p->x = " << p->x << "\n";
             //cout << "p->y = " << p->y << "\n";
-            if (( p->x >= x1 ) && ( p->x <= x3 ) && ( p->y >= y1 ) && ( p->y <= y3 ))
+            if (( p->x >= x1 ) && ( p->x <= x3 ))
             {
-                //      r->x=p->x;
-                //      r->y=p->y;
+                p_x = p->x;
+                p_y = p->y;
+                p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
+                p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                r_x = r->x;
+                r_y = r->y;
+                r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
+                r->y = -r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
                 return p;
             }
         }
@@ -154,10 +215,16 @@ public:
             float t = p->y;
             p->y = p->x;
             p->x = t;
-            if (( p->x >= x2 ) && ( p->x <= x4 ) && ( p->y >= y2 ) && ( p->y <= y4 ))
+            if (( p->x >= x2 ) && ( p->x <= x4 ))
             {
-                //       r->x=p->x;
-                //       r->y=p->y;
+                p_x = p->x;
+                p_y = p->y;
+                p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
+                p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                r_x = r->x;
+                r_y = r->y;
+                r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
+                r->y = -r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
                 return p;
             }
         }
@@ -169,8 +236,19 @@ public:
     
     
     void change_direction(RAY * r, point * p ) const {
+        float p_x, p_y, r_x,r_y;
+        p_x = p->x;
+        p_y = p->y;
+        p->x = p_x * cos (this->deg * PI / 180) - p_y * sin (this->deg * PI / 180);
+        p->y = p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+        r_x = r->x;
+        r_y = r->y;
+        r->x = r_x * cos (this->deg * PI / 180) - r_y * sin (this->deg * PI / 180);
+        r->y = r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+
         point * new_p = p;
         float deg = 0;
+        
         if ((p->y <= this->y2) && (p->y >= this->y1)) {
             float beta = asin (fabs (sin (r->deg * PI / 180) / this->n) )* 180 / PI;
             if ((((fabs((this->y1 - p->y)) * tan ((90-beta) * PI / 180)) >= this->w) && (r->y >= p->y)) || (((fabs((this->y2 - p->y)) * tan ((90-beta) * PI / 180)) >= this->w) && (r->y <= p->y))) {
@@ -315,9 +393,12 @@ public:
             }
         }
         //cout << "beta = " << beta << "\n";
-        r->x = new_p->x;
-        r->y = new_p->y;
-        r->deg = deg;
+        r->x = new_p->x * cos (this->deg * PI / 180) + new_p->y * sin (this->deg * PI / 180) ;
+        r->y = new_p->y * cos (this->deg * PI / 180) - new_p->x * sin (this->deg * PI / 180);
+        r->deg = deg + this->deg;
+        if (r->deg > 360)
+            r->deg = r->deg - 360;
+
     }
     
     
@@ -757,9 +838,9 @@ public:
         //cout << " a = " << a << "\n";
         float f = 0;
         if (orient (this->x1, this->y1, this->x2, this->y2, r->x, r->y,1) < 0)
-            f = (float) 1 / ((this->n -1) * ((float)1/this->r1 - (float)1/this->r2 + (float) (this->n * this->d) / (this->n * this->r1 *this->r2))) ;
+            f = (float) 1 / ((this->n -1) * ((float)1/this->r1 - (float)1/this->r2 + (float) ((this->n -1) * this->d) / (this->n * this->r1 *this->r2))) ;
         else
-            f = (float) 1 / ((this->n -1) * ((float)1/this->r2 - (float)1/this->r1 + (float) (this->n * this->d) / (this->n * this->r1 *this->r2))) ;
+            f = (float) 1 / ((this->n -1) * ((float)1/this->r2 - (float)1/this->r1 + (float) ((this->n - 1)* this->d) / (this->n * this->r1 *this->r2))) ;
         if (a != this->f){
             if (a > f) {
                 float b = (float) (f * a / (a - f));

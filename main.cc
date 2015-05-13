@@ -120,9 +120,10 @@ int cs=*(int *)arg;
 				}*/
 			case 4:	//ploskoparallell plastinka
 				{
-                                float a1, x, y, len, wid, n;
-                                sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &len, &wid, &n);
-                                Device  *d = new Disc(x, y, len, wid, 0, n);
+                                float a1, x, y, len, wid, n, angle;
+                                sscanf(buf, "%f %f %f %f %f %f %f",&a1,&x, &y, &len, &wid, &angle,&n);
+                                printf("POKAZ: %f", n);
+                                Device  *d = new Disc(x, y, len, wid, angle, n);
                                 my_device.push_back(d);
                                 printf("New ploskoparallell plastinka was created\n");
 				break;
@@ -217,6 +218,7 @@ for(int I=0; I<my_laser_ray.size(); I++)
 			if (cross != NULL)
             {
 				sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, cross->x, cross->y, '\0');//new dot
+                printf("THIS IS RAY: %s\n", buf_);
 				if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
                     perror("Can't send:");
@@ -232,7 +234,8 @@ for(int I=0; I<my_laser_ray.size(); I++)
                 my_device[i]->change_direction(my_laser_ray[I], cross);
                 if(my_device[i]->getID()==4)
                 {
-                    sprintf(buf_, "%f %f %f %f %c", tx, ty, my_laser_ray[I]->x, my_laser_ray[I]->y);
+                    sprintf(buf_, "%f %f %f %f %c", tx, ty, my_laser_ray[I]->x, my_laser_ray[I]->y, 0);
+                    printf("THIS IS RAY: %s\n", buf_);
 				    if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                     {
                         perror("Can't send:");
@@ -240,7 +243,6 @@ for(int I=0; I<my_laser_ray.size(); I++)
                     }
                     recv(cs, temp, 1, 0);
                 }
-                printf("I: %d; k: %d; i: %d.\n",I, k, i);
 				break;
 			}
 		}
@@ -251,10 +253,12 @@ for(int I=0; I<my_laser_ray.size(); I++)
 	}
 }
 	//cross screen
-/*	cross = NULL;
-	cross = my_screen->cross_point(my_laser_ray);
+    for(int I=0; I<my_laser_ray.size(); I++)
+    {
+    cross = NULL;
+	cross = my_screen->cross_point(my_laser_ray[I]);
 	if (cross != NULL){
-		sprintf(buf_, "%f %f %f %f %c", my_laser_ray->x, my_laser_ray->y, cross->x, cross->y, '\0');
+		sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, cross->x, cross->y, '\0');
 		if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
             perror("Can't send:");
@@ -272,7 +276,8 @@ for(int I=0; I<my_laser_ray.size(); I++)
             return NULL;
         }
 recv(cs, temp, 1, 0);
-	}*/
+	}
+    }
     if(send(cs, "FINISH\0", 7, MSG_NOSIGNAL)==-1)
     {
             perror("Can't send:");
