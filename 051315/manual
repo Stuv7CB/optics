@@ -1,0 +1,38 @@
+source:		0	10	20	N 	(360/(N-1))=m, m - целое число. Например, N = 19, N = 37.
+		source	x	y	количество лучей, которое создается
+
+screen: 	1	x	y	length	deg
+		screen	
+
+//lens : 		2 	23	25	10	0	10
+//f>0		lens	x	y	length	deg_0	focus
+
+lens:		3 					f>0
+f<0		lens	x	y	length	deg_0	focus
+
+plosk:		4	x	y	length	width	n	
+plast
+плоскопараллельная пластинка
+
+laser:		5	x	y 	deg
+лазер		mirror	
+	
+parabolic:	6	x	y	l	f	
+
+mirror:		7	x	y	deg
+зеркало
+
+prism:		8	x1	y1	x2	y2	x3	y3	n
+треугольная 			точки треугольника
+призма
+
+ellipse:	9	x	y	l	f1x	f1y	f2x	f2y	a	//f1,f2 - focuses, a - big poluos'
+
+lens:		
+wide
+
+
+Все значения - float
+Все углы - в градусах
+x,y - координаты центра
+//
