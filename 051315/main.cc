@@ -279,8 +279,10 @@ for(int I=0; I<my_laser_ray.size(); I++)
 	}
 	else{
 		//find граница, куда дойдет луч
-		sprintf(buf_, "%f %f %f %f %c", 100, 100, 100, 100, 0);
-//		sprintf(buf_, "\0");		
+		float retx, rety;
+		retx = my_laser_ray[I]->x + 1000 * cos(my_laser_ray[I]->deg);
+		rety = my_laser_ray[I]->y + 1000 * sin(my_laser_ray[I]->deg); 
+		sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, retx, rety, '\0');
 		if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
             perror("Can't send:");
