@@ -121,7 +121,7 @@ int cs=*(int *)arg;
                         case 3: //mirror
                                 {
                                 float a1, x, y, l, deg;
-                                sscanf(buf, "%f %f %f %f",&a1,&x, &y, &l, &deg);
+                                sscanf(buf, "%f %f %f %f %f",&a1,&x, &y, &l, &deg);
 //                                Device  *d = new PlainRefl(x, y, l, deg);
 //                                my_device.push_back(d);
                                 printf("New mirror was created\n");
@@ -130,9 +130,9 @@ int cs=*(int *)arg;
 
 			case 4:	//ploskoparallell plastinka == disc
 				{
-                                float a1, x, y, len, wid, n;
-                                sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &len, &wid, &n);
-                                Device  *d = new Disc(x, y, len, wid, 0, n);
+                                float a1, x, y, len, wid, deg, n;
+                                sscanf(buf, "%f %f %f %f %f %f %f",&a1,&x, &y, &len, &wid, &deg, &n);
+                                Device  *d = new Disc(x, y, len, wid, deg, n);
                                 my_device.push_back(d);
                                 printf("New ploskoparallell plastinka was created\n");
 				break;
@@ -158,8 +158,8 @@ int cs=*(int *)arg;
 
 			case 7:	//sphere mirror
 				{
-                                float a1, x, y, l, f;
-                                sscanf(buf, "%f %f %f %f %f %f",&a1, &x, &r0, &deg_1, &deg_2);
+                                float a1, x, y, r0, deg_1, deg_2;
+                                sscanf(buf, "%f %f %f %f %f %f",&a1, &x, &y, &r0, &deg_1, &deg_2);
 				Device  *d = new SphereRefl(x, y, r0, deg_1, deg_2);
                                 my_device.push_back(d);
                                 printf("New sphere mirror was created\n");
@@ -167,9 +167,9 @@ int cs=*(int *)arg;
 				}
 			case 8:	//wide length
 				{
-                                float a1, x, y, l, deg, r1, r2, n, d;
-                                sscanf(buf, "%f %f %f %f %f %f %f %f",&a1, &x, &y, &l, &deg, &r1, &r2, &n, &d);
-                                Device  *d = new Lens_wide(x, y, l, deg, r1, r2, n, d);
+                                float a1, x, y, l, deg, r1, r2, n, de;
+                                sscanf(buf, "%f %f %f %f %f %f %f %f %f",&a1, &x, &y, &l, &deg, &r1, &r2, &n, &de);
+                                Device  *d = new Lens_wide(x, y, l, deg, r1, r2, n, de);
                                 my_device.push_back(d);
                                 printf("New triangle prism was created\n");
 				break;
@@ -244,7 +244,7 @@ for(int I=0; I<my_laser_ray.size(); I++)
                 my_device[i]->change_direction(my_laser_ray[I], cross);
                 if(my_device[i]->getID()==4)
                 {
-                    sprintf(buf_, "%f %f %f %f %c", tx, ty, my_laser_ray[I]->x, my_laser_ray[I]->y);
+                    sprintf(buf_, "%f %f %f %f %c", tx, ty, my_laser_ray[I]->x, my_laser_ray[I]->y, 0);
 				    if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                     {
                         perror("Can't send:");
