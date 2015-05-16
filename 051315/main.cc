@@ -69,15 +69,14 @@ int cs=*(int *)arg;
 
         vector <Device*> my_device;
 	vector <SCREEN *> my_screen;
-        SCREEN *scr1 = new SCREEN(5000, 5000, 5000, 5010);
-	SCREEN *scr2 = new SCREEN(5000, -5000, 5000, -5010); 
-	SCREEN *scr3 = new SCREEN(-5000, 5000, -5000, -5010);
-	SCREEN *scr4 = new SCREEN(-5000, -5000, -5000, -5010);
+    /*SCREEN *scr1 = new SCREEN(2500, 0, 5000, 90);
+	SCREEN *scr2 = new SCREEN(2500, 5000, 5000, 90); 
+	SCREEN *scr3 = new SCREEN(0,2500, 5000, 0);
+	SCREEN *scr4 = new SCREEN(5000, 2500, 5000, 0);
 	my_screen.push_back(scr1);
 	my_screen.push_back(scr2);
 	my_screen.push_back(scr3);
-	my_screen.push_back(scr4);
-	
+	my_screen.push_back(scr4);	*/
         vector<LASER*> my_laser;
         vector<SOURCE*> my_source;
     	if(send(cs, "1", 1, MSG_NOSIGNAL)==-1)
@@ -265,6 +264,10 @@ for(int I=0; I<my_laser_ray.size(); I++)
                 printf("I: %d; k: %d; i: %d.\n",I, k, i);
 				break;
 			}
+            else
+            {
+                k=i+1;
+            }
 		}
 		if (q == false){
             printf("%d\n",I);
@@ -273,15 +276,21 @@ for(int I=0; I<my_laser_ray.size(); I++)
 	}
 }
 	//cross screen
+    point * crossing;
+    float tx;
+    float ty;
     for(int I=0; I<my_laser_ray.size(); I++)
     {
 //	my_screen->sort();
 	int s_num = -1;
 	for (int j = 0; j < my_screen.size(); j++){
 		cross = NULL;
+        tx=my_laser_ray[I]->x;
+        ty=my_laser_ray[I]->y;
 		cross = my_screen[j]->cross_point(my_laser_ray[I]);
 		if (cross != NULL){
-			s_num = j;			
+			s_num = j;		
+            crossing=cross;
 			break;
 		}
 	}
@@ -300,8 +309,7 @@ for(int I=0; I<my_laser_ray.size(); I++)
 
 	}
 	else{
-		cross = my_screen[s_num]->cross_point(my_laser_ray[I]);
-		sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, cross->x, cross->y, '\0');
+		sprintf(buf_, "%f %f %f %f %c", tx, ty, crossing->x, crossing->y, '\0');
                 if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
             	perror("Can't send:");
