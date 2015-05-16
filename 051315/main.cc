@@ -288,8 +288,8 @@ for(int I=0; I<my_laser_ray.size(); I++)
 	if (s_num == -1){
                 //find граница, куда дойдет луч
                 float retx, rety;
-                retx = my_laser_ray[I]->x + 2000 * cos(RadToGrad(my_laser_ray[I]->deg));
-                rety = my_laser_ray[I]->y + 2000 * sin(RadToGrad(my_laser_ray[I]->deg)); 
+                retx = my_laser_ray[I]->x + 2000 * cos(GradToRad(my_laser_ray[I]->deg));
+                rety = my_laser_ray[I]->y + 2000 * sin(GradToRad(my_laser_ray[I]->deg)); 
                 sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, retx, rety, '\0');
                 if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
