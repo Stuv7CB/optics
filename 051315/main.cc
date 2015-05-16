@@ -169,7 +169,7 @@ int cs=*(int *)arg;
 			case 8:	//wide length
 				{
                                 float a1, x, y, l, deg, r1, r2, n, de;
-                                sscanf(buf, "%f %f %f %f %f %f %f %f %f",&a1, &x, &y, &l, &deg, &r1, &r2, &n, &de);
+                                sscanf(buf, "%f %f %f %f %f %f %f %f %f",&a1, &x, &y, &r1, &r2, &deg, &n, &l, &de);
                                 Device  *d = new Lens_wide(x, y, l, deg, r1, r2, n, de);
                                 my_device.push_back(d);
                                 printf("New triangle prism was created\n");

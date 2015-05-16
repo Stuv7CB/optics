@@ -1030,6 +1030,8 @@ public:
 
     void change_direction(RAY *r, point *p) const                       //      Плоское зеркало
     {
+		r->x = p->x;
+		r->y = p->y;
                 r->deg = (90 + this->deg) * 2 - r->deg;
 
                 r->deg = r->Deg360(r->deg);
@@ -1148,6 +1150,9 @@ class SphereRefl        :       public Device {
                 float deg_f = RadToGrad(atan((a1 * b2 - a2 * b1) / (a1 * a2 + b1 * b2)));               //      угол между лучом и нормалью к сфере
                 std::cout << "Deg ray-normal: " << deg_f << "\n";
 
+
+		r->x = p->x;
+		r->y = p->y;
                 r->deg = r->deg + (180 - 2 * fabs(deg_f));
                 r->deg = r->Deg360(r->deg);
                 std::cout << "New r->deg: " << r->deg << "\n";
@@ -1383,7 +1388,8 @@ public:
                         r->x = p_new->x;
                         r->y = p_new->y;
                 }
-
+		r->x = p->x;
+		r->y = p->y;
                 r->deg = r->Deg360(r->deg);                                                             //      угол луча в [0..360]
                 std::cout << "New r->deg: " << r->deg << "\n";
     }
