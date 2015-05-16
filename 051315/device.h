@@ -5,7 +5,6 @@
 using namespace std;
 
 #define PI 3.14159265
-#define NUMBER 10            // HERE YOU CAN CHANGE NUMBER OF CREATED RAYS {360 : (NUMBBER - 1)}
 
 
 float LenVect(point *p1, point *p2) {
@@ -1238,7 +1237,7 @@ public:
         point *p = new point();
                 float p_check = (r->x - p1->x) * (p2->y - p1->y) - (r->y - p1->y) * (p2->x - p1->x);    //      источник луча находится на грани призмы
                 if (fabs(p_check) < 0.1) return NULL;
-                float x1, y1, x2, y2, r1, r2, k_ray, b_ray;
+                float x1, y1, x2, y2, r1, r2;
                 float det, det1, det2;
                 float xp, yp;
 
@@ -1309,7 +1308,7 @@ public:
                 gran_vect.push_back(gran_t);
 
                 std::cout << "\n        Create Prism N: " << N << "\n";
-                for (int i = 0; i < P.size();i++) {
+                for (unsigned i = 0; i < P.size();i++) {
                         std::cout << "Point " << i << " x: " << P[i]->x << " y: " << P[i]->y << "\n";
                 }
                 std::cout << "Coeff_N: " << n_coeff << "\n";
@@ -1319,7 +1318,7 @@ public:
         point *p = NULL;
                 float len_min = 1e10;
 
-                for (int i = 0; i < gran_vect.size(); i++) {
+                for (unsigned i = 0; i < gran_vect.size(); i++) {
                         point *p_t = gran_vect[i]->cross_point(r);      //      проверка грани призмы и луча
                         if (p_t != NULL) {
                                 if (r->CheckRayPoint(p_t)) {
@@ -1348,7 +1347,7 @@ public:
         Gran *FindGran(point *pp) const
         {
                 float cos_a = 0;
-                for (int i=0; i < gran_vect.size(); i++) {                      //      нашли грань для точки p
+                for (unsigned i=0; i < gran_vect.size(); i++) {                      //      нашли грань для точки p
                         cos_a = gran_vect[i]->CheckPointCosA(pp);
                         if (fabs(cos_a + 1) < 0.1)
                         {

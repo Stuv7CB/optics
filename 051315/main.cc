@@ -65,7 +65,7 @@ void *func(void* arg)
 int rd;
 char buf[512];
 int cs=*(int *)arg;
-	char buf_[32];
+	char buf_[512];
 
         vector <Device*> my_device;
 	vector <SCREEN *> my_screen;
@@ -209,30 +209,30 @@ int cs=*(int *)arg;
 
 
  	point *cross = NULL;
-	int k = 0; //номер девайса
+	unsigned k = 0; //номер девайса
 	bool q = false; //true, если пересечения есть
     char temp[1];
     vector<RAY*>my_laser_ray;
-    for(int i=0; i<my_laser.size(); i++)
+    for(unsigned i=0; i<my_laser.size(); i++)
     {
         my_laser_ray.push_back(my_laser[i]->rays_create());
     }
 //RAY *my_laser_ray=my_laser->rays_create();
-    for(int i=0; i<my_source.size(); i++)
+    for(unsigned i=0; i<my_source.size(); i++)
     {
         RAY** rt=my_source[i]->rays_create();
-        for(int j=0; j<NUMBER; j++)
+        for(unsigned j=0; j<NUMBER; j++)
         {
             my_laser_ray.push_back(rt[j]);
         }
     }
 //let's work with laser first
-for(int I=0; I<my_laser_ray.size(); I++)
+for(unsigned I=0; I<my_laser_ray.size(); I++)
 {
     cross=NULL;
     k=0;
 	while (k < my_device.size()){
-		for (int i = k; i < my_device.size(); i++){	
+		for (unsigned i = k; i < my_device.size(); i++){	
 			//cross device;
             			cross = my_device[i]-> cross_point(my_laser_ray[I]);
 			if (cross != NULL)
@@ -279,14 +279,17 @@ for(int I=0; I<my_laser_ray.size(); I++)
     point * crossing;
     float tx;
     float ty;
-    for(int I=0; I<my_laser_ray.size(); I++)
+    float tdeg;
+    for(unsigned I=0; I<my_laser_ray.size(); I++)
     {
 //	my_screen->sort();
 	int s_num = -1;
-	for (int j = 0; j < my_screen.size(); j++){
-		cross = NULL;
         tx=my_laser_ray[I]->x;
         ty=my_laser_ray[I]->y;
+        tdeg=my_laser_ray[I]->deg;
+	for (unsigned j = 0; j < my_screen.size(); j++){
+		cross = NULL;
+
 		cross = my_screen[j]->cross_point(my_laser_ray[I]);
 		if (cross != NULL){
 			s_num = j;		
@@ -297,8 +300,8 @@ for(int I=0; I<my_laser_ray.size(); I++)
 	if (s_num == -1){
                 //find граница, куда дойдет луч
                 float retx, rety;
-                retx = my_laser_ray[I]->x + 2000 * cos(GradToRad(my_laser_ray[I]->deg));
-                rety = my_laser_ray[I]->y + 2000 * sin(GradToRad(my_laser_ray[I]->deg)); 
+                retx = my_laser_ray[I]->x + 2000 * cos(GradToRad(tdeg));
+                rety = my_laser_ray[I]->y - 2000 * sin(GradToRad(tdeg)); 
                 sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, retx, rety, '\0');
                 if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
