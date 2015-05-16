@@ -68,8 +68,16 @@ int cs=*(int *)arg;
 	char buf_[32];
 
         vector <Device*> my_device;
-
-        SCREEN *my_screen;
+	vector <SCREEN *> my_screen;
+        SCREEN *scr1 = new SCREEN(5000, 5000, 5000, 5010);
+	SCREEN *scr2 = new SCREEN(5000, -5000, 5000, -5010); 
+	SCREEN *scr3 = new SCREEN(-5000, 5000, -5000, -5010);
+	SCREEN *scr4 = new SCREEN(-5000, -5000, -5000, -5010);
+	my_screen.push_back(scr1);
+	my_screen.push_back(scr2);
+	my_screen.push_back(scr3);
+	my_screen.push_back(scr4);
+	
         vector<LASER*> my_laser;
         vector<SOURCE*> my_source;
     	if(send(cs, "1", 1, MSG_NOSIGNAL)==-1)
@@ -106,7 +114,8 @@ int cs=*(int *)arg;
                                 {
                                 float a1, x1, y1, x2, y2;
                                 sscanf(buf, "%f %f %f %f %f", &a1, &x1, &y1, &x2, &y2);
-                                my_screen = new SCREEN (x1,y1, x2,y2);
+				SCREEN *my_scr = new SCREEN(x1, y1, x2, y2);
+				my_screen.push_back(my_scr);
                                 printf("Screen was created\n");
                                 break;
                                 }
@@ -266,29 +275,39 @@ for(int I=0; I<my_laser_ray.size(); I++)
 	//cross screen
     for(int I=0; I<my_laser_ray.size(); I++)
     {
-    cross = NULL;
-	cross = my_screen->cross_point(my_laser_ray[I]);
-	if (cross != NULL){
-		sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, cross->x, cross->y, '\0');
-		if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
+//	my_screen->sort();
+	int s_num = -1;
+	for (int j = 0; j < my_screen.size(); j++){
+		cross = NULL;
+		cross = my_screen[j]->cross_point(my_laser_ray[I]);
+		if (cross != NULL){
+			s_num = j;			
+			break;
+		}
+	}
+	if (s_num == -1){
+                //find граница, куда дойдет луч
+                float retx, rety;
+                retx = my_laser_ray[I]->x + 1000 * cos(my_laser_ray[I]->deg);
+                rety = my_laser_ray[I]->y + 1000 * sin(my_laser_ray[I]->deg); 
+                sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, retx, rety, '\0');
+                if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
-            perror("Can't send:");
-            return NULL;
-        }
-        recv(cs, temp, 1, 0);
+            		perror("Can't send:");
+            		return NULL;
+        		}
+		recv(cs, temp, 1, 0);
+
 	}
 	else{
-		//find граница, куда дойдет луч
-		float retx, rety;
-		retx = my_laser_ray[I]->x + 1000 * cos(my_laser_ray[I]->deg);
-		rety = my_laser_ray[I]->y + 1000 * sin(my_laser_ray[I]->deg); 
-		sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, retx, rety, '\0');
-		if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
+		cross = my_screen[s_num]->cross_point(my_laser_ray[I]);
+		sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, cross->x, cross->y, '\0');
+                if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
-            perror("Can't send:");
-            return NULL;
-        }
-recv(cs, temp, 1, 0);
+            	perror("Can't send:");
+            	return NULL;
+        	}
+        	recv(cs, temp, 1, 0);
 	}
     }
     if(send(cs, "FINISH\0", 7, MSG_NOSIGNAL)==-1)
