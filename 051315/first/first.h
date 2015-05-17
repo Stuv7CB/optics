@@ -24,6 +24,9 @@ int first(vector <Device *> d, RAY *r){
 	float y = r->y;
 	float rast;
 	float min = 100000;
+	if (d.size==0){
+		return ret;
+	}
 	for (int i = 0; i < d.size(); i++){
 		point *cross = NULL;
 		cross = d[i] -> cross_point(r);
