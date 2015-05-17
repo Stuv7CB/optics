@@ -1114,9 +1114,8 @@ class SphereRefl        :       public Device {
                         float deg_t;
                         if (fabs(delta) < 0.1) {
                                 deg_t  = RadToGrad(atan((OptC->x - p->x) / (OptC->y - p->y)));
-				if (OptC->x - p->x < 0) deg_t += 180{
-                                	deg_t = r->Deg360(deg_t);
-				}
+				if (OptC->x - p->x < 0) deg_t += 180;
+                                deg_t = r->Deg360(deg_t);
 
                                 std::cout << "Sphere Point 1: x=" << p->x << " y=" << p->y << " Sphere Deg=" << deg_t << " deg1=" << deg1 << " deg2=" << deg2 << "\n";
                                 if (deg1 <= deg_t && deg_t <= deg2 ) return p;
