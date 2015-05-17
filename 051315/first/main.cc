@@ -69,15 +69,6 @@ int cs=*(int *)arg;
 
         vector <Device*> my_device;
 	vector <SCREEN *> my_screen;
-        SCREEN *scr1 = new SCREEN(5000, 5000, 5000, 5010);
-	SCREEN *scr2 = new SCREEN(5000, -5000, 5000, -5010); 
-	SCREEN *scr3 = new SCREEN(-5000, 5000, -5000, -5010);
-	SCREEN *scr4 = new SCREEN(-5000, -5000, -5000, -5010);
-	my_screen.push_back(scr1);
-	my_screen.push_back(scr2);
-	my_screen.push_back(scr3);
-	my_screen.push_back(scr4);
-	
         vector<LASER*> my_laser;
         vector<SOURCE*> my_source;
     	if(send(cs, "1", 1, MSG_NOSIGNAL)==-1)
