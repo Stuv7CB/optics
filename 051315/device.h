@@ -21,7 +21,6 @@ point *SumVect(point *p1, point *p2) {
         sum_p->y = p1->y + p2->y;
         return sum_p;
 }
-
 point *SubVect(point *p1, point *p2) {
         point *sub_p = new point;
         sub_p->x = p2->x - p1->x;
