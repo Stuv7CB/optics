@@ -7,10 +7,10 @@
 #include <signal.h>
 #include <stdlib.h>
 //#include "ray.h"    //was included in "device.h"
-//#include "device.h" //was included in "sort.h"
-#include "./sort.h"
 #include <string.h>
 #include <pthread.h>
+#include "first.h"
+
 
 int h;
 
@@ -62,13 +62,13 @@ int main()
 
 void *func(void* arg)
 {
-int rd;
-char buf[512];
-int cs=*(int *)arg;
-	char buf_[32];
+	int rd;
+	char buf[512];
+	int cs=*(int *)arg;
+	char buf_[512];
 
         vector <Device*> my_device;
-        SCREEN *my_screen;
+	vector <SCREEN *> my_screen;
         vector<LASER*> my_laser;
         vector<SOURCE*> my_source;
     	if(send(cs, "1", 1, MSG_NOSIGNAL)==-1)
@@ -79,23 +79,34 @@ int cs=*(int *)arg;
     	while((rd=recv(cs, buf, sizeof(buf), 0))>0){
         	buf[rd]=0;
         	printf("%s\n", buf);
-                int check = buf[0] - '0';
-                printf("check = %d\n", check);
+		int check;
+		
+		if ((buf[1]>='0')&&(buf[1]<='9')){
+                	int check_10 = buf[0] - '0';
+			check_10 = check_10 * 10;
+			int check_1 = buf[1] - '0';
+			check = check_10 + check_1;
+                	printf("check = %d\n", check);
+		}
+		else{
+			check = buf[0] - '0';
+		}
                 switch(check){
-                    case 0:
-                    {
-                        float a1,x,y;
-                        sscanf(buf, "%f %f %f", &a1, &x, &y);
-                        SOURCE* d=new SOURCE(x,y);
-                        my_source.push_back(d);
-                        printf("New source was created\n");
-                        break;
-                    }
+                    	case 0: //source
+                    	{
+                        	float a1,x,y;
+                        	sscanf(buf, "%f %f %f", &a1, &x, &y);
+                        	SOURCE* d=new SOURCE(x,y);
+                        	my_source.push_back(d);
+                        	printf("New source was created\n");
+                        	break;
+                    	}
                         case 1: //screen
                                 {
                                 float a1, x1, y1, x2, y2;
                                 sscanf(buf, "%f %f %f %f %f", &a1, &x1, &y1, &x2, &y2);
-                                my_screen = new SCREEN (x1,y1, x2,y2);
+				SCREEN *my_scr = new SCREEN(x1, y1, x2, y2);
+				my_screen.push_back(my_scr);
                                 printf("Screen was created\n");
                                 break;
                                 }
@@ -108,22 +119,21 @@ int cs=*(int *)arg;
                                 printf("New lens f>0 was created\n");
                                 break;
 				}
-/*			case 3:	//lens f<0
-				{
-                                float a1, x, y, l, deg, f;
-                                sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &l, &deg, &f);
-                                printf("%lf", f);
-                                Device  *d = new Lens(x, y, l, deg, f);
+                        case 3: //mirror == PlainRefl
+                                {
+                                float a1, x, y, l, deg;
+                                sscanf(buf, "%f %f %f %f %f",&a1,&x, &y, &l, &deg);
+                                Device  *d = new PlainRefl(x, y, l, deg);
                                 my_device.push_back(d);
-                                printf("New lens f<0 was created\n");
-				break;
-				}*/
-			case 4:	//ploskoparallell plastinka
+                                printf("New mirror was created\n");
+                                break;
+                                }
+
+			case 4:	//ploskoparallell plastinka == disc
 				{
-                                float a1, x, y, len, wid, n, angle;
-                                sscanf(buf, "%f %f %f %f %f %f %f",&a1,&x, &y, &len, &wid, &angle,&n);
-                                printf("POKAZ: %f", n);
-                                Device  *d = new Disc(x, y, len, wid, angle, n);
+                                float a1, x, y, len, wid, deg, n;
+                                sscanf(buf, "%f %f %f %f %f %f %f",&a1,&x, &y, &len, &wid, &deg, &n);
+                                Device  *d = new Disc(x, y, len, wid, deg, n);
                                 my_device.push_back(d);
                                 printf("New ploskoparallell plastinka was created\n");
 				break;
@@ -136,30 +146,32 @@ int cs=*(int *)arg;
 				printf("New laser was created\n");
                                 break;
                                 }
+                        case 6: //triangle prism
+                                {
+                                float a1, x1, y1, x2, y2, x3, y3, n;
+                                sscanf(buf, "%f %f %f %f %f %f %f %f",&a1,&x1, &y1, &x2, &y2, &x3, &y3, &n);
+                                int num = 1;
+                                Device  *d = new Prism(num,x1, y1, x2, y2, x3, y3, n);
+                                my_device.push_back(d);
+                                printf("New triangle prism was created\n");
+                                break;
+                                }
+
 			case 7:	//sphere mirror
 				{
-                                float a1, x, y, r, deg1, deg2;
-                                sscanf(buf, "%f %f %f %f %f %f",&a1,&x, &y, &r, &deg1, &deg2);
-//                                Device  *d = new Lens(x, y, l, deg, f);
-//                                my_device.push_back(d);
+                                float a1, x, y, r0, deg_1, deg_2;
+                                sscanf(buf, "%f %f %f %f %f %f",&a1, &x, &y, &deg_1, &deg_2, &r0);
+				Device  *d = new SphereRefl(x, y, r0, deg_1-90, deg_2-90);
+                                my_device.push_back(d);
                                 printf("New sphere mirror was created\n");
 				break;
 				}
-			case 3:	//mirror
+			case 8:	//wide length
 				{
-                                float a1, x, y, deg;
-                                sscanf(buf, "%f %f %f %f",&a1,&x, &y, &deg);
-//                                Device  *d = new Lens(x, y, l, deg, f);
-//                                my_device.push_back(d);
-                                printf("New mirror was created\n");
-				break;
-				}
-			case 6:	//triangle prism
-				{
-                                float a1, x1, y1, x2, y2, x3, y3, n;
-                                sscanf(buf, "%f %f %f %f %f %f %f %f",&a1,&x1, &y1, &x2, &y2, &x3, &y3, &n);
-//                                Device  *d = new Lens(x, y, l, deg, f);
-//                                my_device.push_back(d);
+                                float a1, x, y, l, deg, r1, r2, n, de;
+                                sscanf(buf, "%f %f %f %f %f %f %f %f %f",&a1, &x, &y, &r1, &r2, &deg, &n, &l, &de);
+                                Device  *d = new Lens_wide(x, y, l, deg, r1, r2, n, de);
+                                my_device.push_back(d);
                                 printf("New triangle prism was created\n");
 				break;
 				}
@@ -178,14 +190,7 @@ int cs=*(int *)arg;
 			break;
 		}
     	}
-//	Let's imagine we have done it
-//first: пробегаем весь отсортированный массив девайсов. Первое пересечение -> break. Пусть пересекло первым второй девайс
-//Тогда запускаем новый пробег for 3 to n. И так далее пока не дошли до конца. Если мы успешно прошли весь цикл или сделали брейк на энтом, то
-//Запускаем проверку для выходного луча. Пересечет ли он экран? Если да, то в какой точке????. 
-//После нахождения каждой из точек отправляем Лёне запись. write(wr, "точка1, точка 2", 3).
 
-//	Here we need to sort vector my_device by x
-	sort_(my_device);	
 
 
  	point *cross = NULL;
@@ -209,75 +214,66 @@ int cs=*(int *)arg;
 //let's work with laser first
 for(int I=0; I<my_laser_ray.size(); I++)
 {
-    cross=NULL;
-    k=0;
-	while (k < my_device.size()){
-		for (int i = k; i < my_device.size(); i++){	
-			//cross device;
-            			cross = my_device[i]-> cross_point(my_laser_ray[I]);
-			if (cross != NULL)
-            {
-				sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, cross->x, cross->y, '\0');//new dot
-                printf("THIS IS RAY: %s\n", buf_);
-				if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
-                {
-                    perror("Can't send:");
-                    return NULL;
-                }
-                recv(cs, temp, 1, 0);
-                k = i + 1;
-				q = true;
-				/*my_laser_ray->x = cross->x;
-				my_laser_ray->y = cross->y;*/
-                float tx=cross->x;
-                float ty=cross->y;
-                my_device[i]->change_direction(my_laser_ray[I], cross);
-                if(my_device[i]->getID()==4)
-                {
-                    sprintf(buf_, "%f %f %f %f %c", tx, ty, my_laser_ray[I]->x, my_laser_ray[I]->y, 0);
-                    printf("THIS IS RAY: %s\n", buf_);
-				    if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
-                    {
-                        perror("Can't send:");
-                        return NULL;
-                    }
-                    recv(cs, temp, 1, 0);
-                }
-				break;
-			}
+    	
+	int num = first(my_device, my_laser_ray[I]);
+	while(num != -1){
+		int num = first(my_device, my_laser_ray[I]);
+		if (num != -1){
+			cross = my_device[num]->cross_point(my_laser_ray[I]);
+                	sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, cross->x, cross->y, '\0');//new dot
+                	if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1){
+                    	perror("Can't send:");
+                    	return NULL;
+                	}
+                	recv(cs, temp, 1, 0);
+                	float tx=cross->x;
+                	float ty=cross->y;
+                	my_device[num]->change_direction(my_laser_ray[I], cross);
+                	if(my_device[num]->getID()==4){
+                    		sprintf(buf_, "%f %f %f %f %c", tx, ty, my_laser_ray[I]->x, my_laser_ray[I]->y, 0);
+                                if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1){
+                        		perror("Can't send:");
+                        		return NULL;
+                    		}
+                    	recv(cs, temp, 1, 0);
+                	}
 		}
-		if (q == false){
-            printf("%d\n",I);
+		else{
 			break;
 		}
 	}
-}
 	//cross screen
-    for(int I=0; I<my_laser_ray.size(); I++)
-    {
-    cross = NULL;
-	cross = my_screen->cross_point(my_laser_ray[I]);
-	if (cross != NULL){
-		sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, cross->x, cross->y, '\0');
-		if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
+	float tx, ty, tdeg;
+	tx=my_laser_ray[I]->x;
+	ty=my_laser_ray[I]->y;
+	tdeg=my_laser_ray[I]->deg;
+	int s_num = first_s(my_screen, my_laser_ray[I]);
+	if (s_num == -1){
+                //find граница, куда дойдет луч
+                float retx, rety;
+                retx = my_laser_ray[I]->x + 2000 * cos(GradToRad(tdeg));
+                rety = my_laser_ray[I]->y - 2000 * sin(GradToRad(tdeg)); 
+                sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, retx, rety, '\0');
+                if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
-            perror("Can't send:");
-            return NULL;
-        }
-        recv(cs, temp, 1, 0);
+            		perror("Can't send:");
+            		return NULL;
+        		}
+		recv(cs, temp, 1, 0);
+
 	}
 	else{
-		//find граница, куда дойдет луч
-//		sprintf(buf_, "%f %f", );
-//		sprintf(buf_, "\0");		
-		if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
+
+		cross = my_screen[s_num]->cross_point(my_laser_ray[I]);
+		sprintf(buf_, "%f %f %f %f %c", tx, ty, crossing->x, crossing->y, '\0');
+                if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1)
                 {
-            perror("Can't send:");
-            return NULL;
-        }
-recv(cs, temp, 1, 0);
+            	perror("Can't send:");
+            	return NULL;
+        	}
+        	recv(cs, temp, 1, 0);
 	}
-    }
+}
     if(send(cs, "FINISH\0", 7, MSG_NOSIGNAL)==-1)
     {
             perror("Can't send:");
