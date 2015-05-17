@@ -8,7 +8,6 @@ using namespace std;
 #define PI 3.14159265
 #define NUMBER 37            // HERE YOU CAN CHANGE NUMBER OF CREATED RAYS {360 : (NUMBBER - 1)}
 
-
 struct point  {
     float x ;
     float y ;
