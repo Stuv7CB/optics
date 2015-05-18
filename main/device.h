@@ -138,8 +138,8 @@ public:
             p->x = (float)det_1/det;
             p->y = (float)det_2/det;
             
-            cout << "p->x = " << p->x << " p->y = " << p->y << "\n";
-            cout << "x1 = " << x1 << " x2 = " << x2 << " y1 = " << y1 << " y2 = " << y2  << "\n";
+           // cout << "p->x = " << p->x << " p->y = " << p->y << "\n";
+           // cout << "x1 = " << x1 << " x2 = " << x2 << " y1 = " << y1 << " y2 = " << y2  << "\n";
 
 
             if ( ( p->y >= y1 ) && ( p->y <= y2 ))
@@ -148,10 +148,15 @@ public:
                 p_y = p->y;
                 p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
                 p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                
                 r_x = r->x;
                 r_y = r->y;
                 r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
-                r->y = -r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->y = - r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->deg = r->deg + this->deg;
+                if (r->deg > 360)
+                    r->deg = r->deg - 360;
+                
                 return p;
             }
         }
@@ -167,10 +172,15 @@ public:
                 p_y = p->y;
                 p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
                 p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                
                 r_x = r->x;
                 r_y = r->y;
                 r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
-                r->y = -r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->y = - r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->deg = r->deg + this->deg;
+                if (r->deg > 360)
+                    r->deg = r->deg - 360;
+                
                 return p;
             }
         }
@@ -182,7 +192,7 @@ public:
             float det_1 = this->x3 * this->y1 - this->x1 * this->y3 - (this->y1 - this->y3) * (r->x +  (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180) * r->y);
             //cout << "det_1 = " << det_1 << "\n";
             float det_2 = (this->x3 - this->x1) * (r->x +  (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180) * r->y) - (this->x3 * this->y1 - this->x1 * this->y3) *  (float) cos (r->deg * PI / 180) / sin (r->deg * PI / 180);
-            cout << "det_2 = " << det_2 << "\n";
+          //  cout << "det_2 = " << det_2 << "\n";
             p->x = (float)det_1/det;
             p->y = (float)det_2/det;
             float t = p->y;
@@ -196,10 +206,15 @@ public:
                 p_y = p->y;
                 p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
                 p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                
                 r_x = r->x;
                 r_y = r->y;
                 r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
-                r->y = -r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->y = - r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->deg = r->deg + this->deg;
+                if (r->deg > 360)
+                    r->deg = r->deg - 360;
+                
                 return p;
             }
         }
@@ -220,35 +235,58 @@ public:
                 p_y = p->y;
                 p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
                 p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                
                 r_x = r->x;
                 r_y = r->y;
                 r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
-                r->y = -r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->y = - r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->deg = r->deg + this->deg;
+                if (r->deg > 360)
+                    r->deg = r->deg - 360;
+                
                 return p;
             }
         }
         
-        
+        r_x = r->x;
+        r_y = r->y;
+        r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
+        r->y = - r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+        r->deg = r->deg + this->deg;
+        if (r->deg > 360)
+            r->deg = r->deg - 360;
         
         return NULL;
     }
     
     
     void change_direction(RAY * r, point * p ) const {
-        float p_x, p_y, r_x,r_y;
+        //cout<< "this->n = " << this->n << "\n";
+        float p_x, p_y, r_x, r_y;
         p_x = p->x;
         p_y = p->y;
         p->x = p_x * cos (this->deg * PI / 180) - p_y * sin (this->deg * PI / 180);
         p->y = p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+        
         r_x = r->x;
         r_y = r->y;
         r->x = r_x * cos (this->deg * PI / 180) - r_y * sin (this->deg * PI / 180);
         r->y = r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+        if (r->deg >= this->deg)
+            r->deg = r->deg - this->deg;
+        else
+            r->deg = 360 + r->deg -this->deg;
 
         point * new_p = p;
         float deg = 0;
         
-        if ((p->y <= this->y2) && (p->y >= this->y1)) {
+        //cout << "p->x = " << p->x << "\n";
+        //cout << "p->y = " << p->y << "\n";
+        //cout << "this->y1 = " <<  this->y1 << "\n";
+        //cout << "this->y2 = " <<  this->y2 << "\n";
+        
+        if (((p->y + 0.0001) < this->y2) && ((p->y - 0.0001) > this->y1)) {
+            cout << "h_0 \n";
             float beta = asin (fabs (sin (r->deg * PI / 180) / this->n) )* 180 / PI;
             if ((((fabs((this->y1 - p->y)) * tan ((90-beta) * PI / 180)) >= this->w) && (r->y >= p->y)) || (((fabs((this->y2 - p->y)) * tan ((90-beta) * PI / 180)) >= this->w) && (r->y <= p->y))) {
                 if (r->x < p->x){
@@ -341,6 +379,7 @@ public:
                         new_p->x = p->x - this->l * tan ( beta * PI / 180);
                     }
                     else {
+                        //cout << beta ;
                         beta = fabs (beta);
                         new_p->y = p->y - this->l;
                         new_p->x = p->x + this->l * tan ( beta * PI / 180);
@@ -391,7 +430,7 @@ public:
                 }
             }
         }
-        //cout << "beta = " << beta << "\n";
+    //    cout << "beta = " << beta << "\n";
         r->x = new_p->x * cos (this->deg * PI / 180) + new_p->y * sin (this->deg * PI / 180) ;
         r->y = new_p->y * cos (this->deg * PI / 180) - new_p->x * sin (this->deg * PI / 180);
         r->deg = deg + this->deg;
@@ -410,13 +449,12 @@ public:
 };
 
 
-
-class Lens : public Device{
+class Lens_ras : public Device{
 public:
     float deg, f, l;
     
 public:
-    Lens( float x, float y, float l_0, float deg_0, float f_0){       //deg from vertical 0 <= deg < 90 !!! against hour ;
+    Lens_ras ( float x, float y, float l_0, float deg_0, float f_0){       //deg from vertical 0 <= deg < 90 !!! against hour ;
         x1 = x - (float)(l_0/2) * sin (deg_0 * PI / 180) ;
         x2 = x + (float)(l_0/2) * sin (deg_0 * PI / 180);
         y1 = y - (float)(l_0/2) * cos (deg_0 * PI / 180);
@@ -428,6 +466,7 @@ public:
     point * cross_point (RAY * r) const {
         point * p = new point  ();
         if ((orient (this->x1,this->y1,this->x2,this->y2,r->x,r->y,1) < 0) && ((r->deg <= 90) || (r->deg >= 270))){
+            cout << "c_here_1 \n";
             float det = this->y2 - this->y1 - tan (r->deg * PI / 180) * (this->x1 - this->x2);
             float det_1 = this->y2 * this->x1 - this->y1 * this->x2 - (this->x1 - this->x2) * (r->y + tan (r->deg * PI / 180) * r->x);
             float det_2 = (this->y2 - this->y1) * (r->y + tan (r->deg * PI / 180) * r->x) - (this->y2 * this->x1 - this->y1 * this->x2) * tan (r->deg * PI / 180);
@@ -437,13 +476,12 @@ public:
                 return p;
         }
         if ((orient (this->x1,this->y1,this->x2,this->y2,r->x,r->y,1) > 0) && ((r->deg >= 90) && (r->deg <= 270))) {
+            cout << "c_here_2 \n";
             float det = this->y2 - this->y1 - tan (r->deg * PI / 180) * (this->x1 - this->x2);
             float det_1 = this->y2 * this->x1 - this->y1 * this->x2 - (this->x1 - this->x2) * (r->y + tan (r->deg * PI / 180) * r->x);
             float det_2 = (this->y2 - this->y1) * (r->y + tan (r->deg * PI / 180) * r->x) - (this->y2 * this->x1 - this->y1 * this->x2) * tan (r->deg * PI / 180);
             p->x = (float)det_1/det;
-            cout << "p->x = " << p->x << "\n" ;
             p->y = (float)det_2/det;
-            cout << "p->x = " << p->x << "\n" ;
             if (( p->x >= x1 ) && ( p->x <= x2 ) && ( p->y >= y1 ) && ( p->y <= y2 ))
                 return p;
         }
@@ -480,18 +518,229 @@ public:
         //cout << " line_tg = " << line_tg << "\n";
         float a = length * cos (atan (line_tg));
         //cout << " a = " << a << "\n";
+        float b = (float) (this->f * a / (a + this->f));
+        //cout << " b = " << b << "\n";
+        c =  sqrt ((p->x - (this->x1 + this->x2)/2) * (p->x - (this->x1 + this->x2)/2)+ (p->y - (this->y1 + this->y2)/2) * (p->y - (this->y1 + this->y2)/2)) ;
+        
+        if (((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0) && (orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), p->x, p->y,this->deg) <= 0))  || ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) <= 0) && (orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), p->x, p->y,this->deg) >= 0))) {   // точка пересечения и координата луча по разные стороны от опт.оси
+            l_1 = c + (float) b * line_tg;
+            cout << "here \n";
+            alpha = atan ((float) (l_1 / b)) * 180 / PI;
+            alpha_r = 180 -alpha ;
+            if ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0) && (orient (this->x1, this->y1 + this->l / 2/cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2/cos (this->deg * PI / 180), p->x, p->y,this->deg) <= 0)) { //точка координата луча выше точка пересечения ниже
+                alpha_r = alpha_r + 2 * alpha;
+                alpha = 360 - alpha;
+                cout << " here_0 \n";
+            }
+            
+        }
+        else {   //точка персечкения и полоожение луча по одну сторону от опт.оси
+            l_1 = fabs (c - (float) b * line_tg);
+            alpha = atan ((float) (l_1 / b)) * 180 / PI;
+            alpha_r = 180 -alpha ;
+            cout << "here_here \n";
+            if ((orient (this->x1, this->y1 + this->l / 2/cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0) && (orient (this->x1, this->y1 + (this->l / 2 - b * line_tg) / cos (this->deg * PI / 180) ,this->x2, this->y2 - (this->l / 2 + b * line_tg) / cos (this->deg * PI / 180), p->x, p->y,this->deg) <= 0)){ // луч выше опт.оси точка пересечения под всмогат.линией сверху
+                alpha_r = alpha_r + 2 * alpha;
+                alpha = 360 - alpha;
+                cout << "here_1 \n";
+                
+            }
+            
+            
+            if ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) <= 0) && (orient (this->x1, this->y1 + (this->l / 2 + b * line_tg) / cos (this->deg * PI / 180) ,this->x2, this->y2 - (this->l / 2 - b * line_tg) / cos (this->deg * PI / 180), p->x, p->y,this->deg) <= 0)) {  // луч ниже опт.оси точка пересечения над всмогат.линией снизу
+                alpha_r = alpha_r + 2 * alpha;
+                alpha = 360 - alpha;
+                cout << "alpha =" << alpha << "\n";
+                cout << "here_2 \n";
+            }
+            
+        }
+        if (orient (this->x1,this->y1,this->x2,this->y2,r->x,r->y,1) < 0)
+            r->deg = alpha ;
+        else
+            r->deg = alpha_r;
+        
+        if (orient (this->x1,this->y1,this->x2,this->y2,r->x,r->y,1) < 0) {
+            if ((r->deg + this->deg - 360) > 0)
+                r->deg = (r->deg + this->deg - 360);
+            else
+                r->deg = r->deg + this->deg;
+        }
+        else {
+            
+            r->deg = r->deg + this->deg;
+        }
+        
+        r->x = p->x;
+        r->y = p->y;
+    }
+    const char *getID() const{
+        return "Lens_ras";
+    }
+    
+    ~Lens_ras ()
+    {
+        cout << "Destructure of the Lens_ras" << "\n";
+    }
+    
+    
+};
+
+
+
+class Lens : public Device{
+public:
+    float deg, f, l;
+    
+public:
+    Lens( float x, float y, float l_0, float deg_0, float f_0){       //deg from vertical 0 <= deg < 90 !!! against hour ;
+        float x_1 = x - (float)(l_0/2) * sin (deg_0 * PI / 180);
+        float x_2 = x + (float)(l_0/2) * sin (deg_0 * PI / 180);
+        float y_1 = y - (float)(l_0/2) * cos (deg_0 * PI / 180);
+        float y_2 = y + (float)(l_0/2) * cos (deg_0 * PI / 180);
+        
+        
+        deg = deg_0;
+        
+        x1 = x_1 * cos (deg * PI / 180) - y_1 * sin (deg * PI / 180);
+        x2 = x_2 * cos (deg * PI / 180) - y_2 * sin (deg * PI / 180);
+        y1 = x_1 * sin (deg * PI / 180) + y_1 * cos (deg * PI / 180);
+        y2 = x_2 * sin (deg * PI / 180) + y_2 * cos (deg * PI / 180);
+        
+        l = l_0;
+        f = f_0;
+        
+      //  cout << "x_1 = " << x_1 << " x_2 = " << x_2 <<  " y_1 = " << y_1 << " y_2 = " << y_2 <<  "\n";
+        
+     //   cout << "x1 = " << x1 << " x2 = " << x2 << " y1 = " << y1 << " y2 = " << y2 <<  "\n";
+
+
+    }
+    point * cross_point (RAY * r) const {
+        point * p = new point  ();
+        
+        //cout << "y1_test = " << y1 << "\n";
+        float p_x, p_y;
+        float r_x, r_y;
+        r_x = r->x;
+        r_y = r->y;
+        r->x = r_x * cos (this->deg * PI / 180) - r_y * sin (this->deg * PI / 180);
+        r->y = r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+        cout << "check0 r->deg = " << r->deg << "\n";
+
+        if (r->deg >= this->deg)
+            r->deg = r->deg - this->deg;
+        else
+            r->deg = 360 + r->deg -this->deg;
+        
+        cout << "check1 r->deg = " << r->deg << "\n";
+
+        if ((orient (this->x1,this->y1,this->x2,this->y2,r->x,r->y,1) < 0) && ((r->deg <= 90) || (r->deg >= 270))){
+            float det = this->y2 - this->y1 - tan (r->deg * PI / 180) * (this->x1 - this->x2);
+            float det_1 = this->y2 * this->x1 - this->y1 * this->x2 - (this->x1 - this->x2) * (r->y + tan (r->deg * PI / 180) * r->x);
+            float det_2 = (this->y2 - this->y1) * (r->y + tan (r->deg * PI / 180) * r->x) - (this->y2 * this->x1 - this->y1 * this->x2) * tan (r->deg * PI / 180);
+            p->x = (float)det_1/det;
+            p->y = (float)det_2/det;
+            if (( p->y >= y1 ) && ( p->y <= y2 )){
+                p_x = p->x;
+                p_y = p->y;
+                p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
+                p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                
+                r_x = r->x;
+                r_y = r->y;
+                r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
+                r->y = - r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->deg = r->deg + this->deg;
+                if (r->deg > 360)
+                    r->deg = r->deg - 360;
+                
+                cout << "check2 this->deg = " << this->deg << "\n";
+                
+                return p;
+            }
+        }
+        if ((orient (this->x1,this->y1,this->x2,this->y2,r->x,r->y,1) > 0) && ((r->deg >= 90) && (r->deg <= 270))) {
+            float det = this->y2 - this->y1 - tan (r->deg * PI / 180) * (this->x1 - this->x2);
+            float det_1 = this->y2 * this->x1 - this->y1 * this->x2 - (this->x1 - this->x2) * (r->y + tan (r->deg * PI / 180) * r->x);
+            float det_2 = (this->y2 - this->y1) * (r->y + tan (r->deg * PI / 180) * r->x) - (this->y2 * this->x1 - this->y1 * this->x2) * tan (r->deg * PI / 180);
+            p->x = (float)det_1/det;
+            cout << "p->x = " << p->x << "\n" ;
+            p->y = (float)det_2/det;
+            cout << "p->x = " << p->x << "\n" ;
+            if (( p->y >= y1 ) && ( p->y <= y2 )) {
+                p_x = p->x;
+                p_y = p->y;
+                p->x = p_x * cos (this->deg * PI / 180) + p_y * sin (this->deg * PI / 180);
+                p->y = - p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+                
+                r_x = r->x;
+                r_y = r->y;
+                r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
+                r->y = - r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+                r->deg = r->deg + this->deg;
+                if (r->deg > 360)
+                    r->deg = r->deg - 360;
+                return p;
+            }
+        }
+        
+        r_x = r->x;
+        r_y = r->y;
+        r->x = r_x * cos (this->deg * PI / 180) + r_y * sin (this->deg * PI / 180);
+        r->y = - r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+        r->deg = r->deg + this->deg;
+        if (r->deg > 360)
+            r->deg = r->deg - 360;
+        return NULL;
+    }
+    
+    void change_direction(RAY * r, point * p ) const
+    {
+        float p_x, p_y, r_x, r_y;
+        p_x = p->x;
+        p_y = p->y;
+        p->x = p_x * cos (this->deg * PI / 180) - p_y * sin (this->deg * PI / 180);
+        p->y = p_x * sin (this->deg * PI / 180) + p_y * cos (this->deg * PI / 180);
+        
+        r_x = r->x;
+        r_y = r->y;
+        r->x = r_x * cos (this->deg * PI / 180) - r_y * sin (this->deg * PI / 180);
+        r->y = r_x * sin (this->deg * PI / 180) + r_y * cos (this->deg * PI / 180);
+        if (r->deg >= this->deg)
+            r->deg = r->deg - this->deg;
+        else
+            r->deg = 360 + r->deg -this->deg;
+        float l_1 = 0;
+        float alpha = 0;
+        float alpha_r = 0;
+        float c = 0 ;
+        float length = (float) sqrt ((r->x - (this->x1 + this->x2)/2) * (r->x - (this->x1 + this->x2)/2)+ (r->y - (this->y1 + this->y2)/2) * (r->y - (this->y1 + this->y2)/2)) ;
+        float line_tg = fabs ((float)((r->y - (this->y1 + this->y2)/2) / ((this->x1 + this->x2)/2 - r->x))) ;
+        //cout << " line_tg_prev = " << line_tg << "\n";
+        float line_deg = atan (line_tg) * 180 / PI;
+        //cout << "line_deg_prev = " << line_deg <<"\n";
+        
+        
+        cout << "line_deg = " << line_deg << "\n";
+        line_tg = tan (line_deg * PI / 180);
+        
+        //cout << " line_tg = " << line_tg << "\n";
+        float a = length * cos (atan (line_tg));
+        //cout << " a = " << a << "\n";
         if (a != this->f){
             if (a > this->f) {
                 float b = (float) (this->f * a / (a - this->f));
                 cout << " b = " << b << "\n";
                 c =  sqrt ((p->x - (this->x1 + this->x2)/2) * (p->x - (this->x1 + this->x2)/2)+ (p->y - (this->y1 + this->y2)/2) * (p->y - (this->y1 + this->y2)/2)) ;
                 
-                if (((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - l / 2 / cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0) && (orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), p->x, p->y,this->deg) >= 0)) || ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) <= 0) && (orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), p->x, p->y,this->deg) <= 0))) {   // точка пересечения и координата луча выше или ниже опт.оси
+                if (((orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - l / 2 , r->x, r->y,0) >= 0) && (orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2, p->x, p->y,0) >= 0)) || ((orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , r->x, r->y,0) <= 0) && (orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , p->x, p->y,0) <= 0))) {   // точка пересечения и координата луча выше или ниже опт.оси
                     l_1 = c + (float) b * line_tg;
                     cout << "here \n";
                     alpha = atan ((float) (l_1 / b)) * 180 / PI;
+                    cout << "alpha = " << alpha << "\n";
                     alpha_r = 180 -alpha ;
-                    if ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0) && (orient (this->x1, this->y1 + this->l / 2/cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2/cos (this->deg * PI / 180), p->x, p->y,this->deg) >= 0)) { //точка пересечения и координата луча выше
+                    if ((orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , r->x, r->y,0) >= 0) && (orient (this->x1, this->y1 + this->l / 2,this->x2, this->y2 - this->l / 2, p->x, p->y,0) >= 0)) { //точка пересечения и координата луча выше
                         
                         alpha_r = alpha_r + 2 * alpha;
                         alpha = 360 - alpha;
@@ -503,8 +752,9 @@ public:
                 else {   //точка персечкения и полоожение луча по разные стороны от опт.оси
                     l_1 = fabs (c - (float) b * line_tg);
                     alpha = atan ((float) (l_1 / b)) * 180 / PI;
-                    cout << "here \n";
-                    if ((orient (this->x1, this->y1 + this->l / 2/cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0) && (orient (this->x1, this->y1 + (this->l / 2 + b * line_tg) / cos (this->deg * PI / 180) ,this->x2, this->y2 - (this->l / 2 - b * line_tg) / cos (this->deg * PI / 180), p->x, p->y,this->deg) >= 0)){ // луч выше опт.оси точка пересечения под всмогат.линией снизу
+                    alpha_r = 180 -alpha ;
+                    cout << "here_ \n";
+                    if ((orient (this->x1, this->y1 + this->l / 2,this->x2, this->y2 - this->l / 2 , r->x, r->y,0) >= 0) && (orient (this->x1, this->y1 + (this->l / 2 + b * line_tg) ,this->x2, this->y2 - (this->l / 2 - b * line_tg) , p->x, p->y,0) >= 0)){ // луч выше опт.оси точка пересечения под всмогат.линией снизу
                         
                         alpha_r = alpha_r + 2 * alpha;
                         alpha = 360 - alpha;
@@ -513,11 +763,11 @@ public:
                     }
                     
                     
-                    if ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) <= 0) && (orient (this->x1, this->y1 + (this->l / 2 - b * line_tg) / cos (this->deg * PI / 180) ,this->x2, this->y2 - (this->l / 2 + b * line_tg) / cos (this->deg * PI / 180), p->x, p->y,this->deg) >= 0)) {  // луч ниже опт.оси точка пересечения за всмогат.линией сверху
+                    if ((orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , r->x, r->y,0) <= 0) && (orient (this->x1, this->y1 + (this->l / 2 - b * line_tg)  ,this->x2, this->y2 - (this->l / 2 + b * line_tg) , p->x, p->y,0) >= 0)) {  // луч ниже опт.оси точка пересечения за всмогат.линией сверху
                         
                         alpha_r = alpha_r + 2 * alpha;
                         alpha = 360 - alpha;
-                        cout << "alpha =" << alpha << "\n";
+                        cout << "alpha_r =" << alpha_r << "\n";
                         cout << "here_2 \n";
                     }
                     
@@ -534,12 +784,12 @@ public:
                 c =  sqrt ((p->x - (this->x1 + this->x2)/2) * (p->x - (this->x1 + this->x2)/2)+ (p->y - (this->y1 + this->y2)/2) * (p->y - (this->y1 + this->y2)/2)) ;
                 cout << "c = " << c << "\n";
                 
-                if (((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0) && (orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), p->x, p->y,this->deg) <= 0)) || ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) <= 0) && (orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), p->x, p->y,this->deg) >= 0))) { // точка пересечения и координата луча по разные стороны от опт.оси
+                if (((orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , r->x, r->y,0) >= 0) && (orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , p->x, p->y,0) <= 0)) || ((orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , r->x, r->y,0) <= 0) && (orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , p->x, p->y,0) >= 0))) { // точка пересечения и координата луча по разные стороны от опт.оси
                     cout << "here_4\n";
                     l_1 = c + (float) b * line_tg;
                     alpha = atan ((float) (l_1 / b)) * 180 / PI;
                     alpha_r = 180 - alpha;
-                    if ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0) && (orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), p->x, p->y,this->deg) <= 0)){ //  координата луча выше опт.оси точка персечения ниже опт.оси
+                    if ((orient (this->x1, this->y1 + this->l / 2,this->x2, this->y2 - this->l / 2 , r->x, r->y,0) >= 0) && (orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , p->x, p->y,0) <= 0)){ //  координата луча выше опт.оси точка персечения ниже опт.оси
                         alpha_r = alpha_r + 2 * alpha;
                         alpha = 360 - alpha;
                         cout << "here_5\n";
@@ -563,7 +813,7 @@ public:
                     
                     
                     
-                    if ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0) && (orient (this->x1, this->y1 + (this->l / 2 - b * line_tg) / cos (this->deg * PI / 180) ,this->x2, this->y2 - (this->l / 2 + b * line_tg) / cos (this->deg * PI / 180), p->x, p->y,this->deg) <= 0)) {  // луч выше опт.оси  пересечение под вспомагат.линии сверху
+                    if ((orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , r->x, r->y,0) >= 0) && (orient (this->x1, this->y1 + (this->l / 2 - b * line_tg)  ,this->x2, this->y2 - (this->l / 2 + b * line_tg) , p->x, p->y,0) <= 0)) {  // луч выше опт.оси  пересечение под вспомагат.линии сверху
                         alpha_r = alpha_r + 2 * alpha;
                         alpha = 360 - alpha;
                         cout << "here_7\n";
@@ -571,7 +821,7 @@ public:
                     }
                     
                     
-                    if ((orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) <= 0) && (orient (this->x1, this->y1 + (this->l / 2 + b * line_tg) / cos (this->deg * PI / 180) ,this->x2, this->y2 - (this->l / 2 - b * line_tg) / cos (this->deg * PI / 180), p->x, p->y,this->deg) <= 0)) {  // луч ниже опт.оси  пересечение за вспомагат.линии снизу
+                    if ((orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2 , r->x, r->y,0) <= 0) && (orient (this->x1, this->y1 + (this->l / 2 + b * line_tg)  ,this->x2, this->y2 - (this->l / 2 - b * line_tg) , p->x, p->y,0) <= 0)) {  // луч ниже опт.оси  пересечение за вспомагат.линии снизу
                         alpha_r = alpha_r + 2 * alpha;
                         alpha = 360 - alpha;
                         cout << "here_8\n";
@@ -586,8 +836,8 @@ public:
         }
         else { // a = f
             alpha = atan (line_tg) * 180 / PI;
-            alpha_r = alpha;
-            if (orient (this->x1, this->y1 + this->l / 2 /cos (this->deg * PI / 180),this->x2, this->y2 - this->l / 2 /cos (this->deg * PI / 180), r->x, r->y,this->deg) >= 0){
+            alpha_r =180 - alpha;
+            if (orient (this->x1, this->y1 + this->l / 2 ,this->x2, this->y2 - this->l / 2, r->x, r->y,0) >= 0){
                 alpha_r = alpha_r + 2 * alpha;
                 alpha = 360 - alpha;
             }
@@ -598,19 +848,15 @@ public:
                 r->deg = alpha_r;
             
         }
-        if (orient (this->x1,this->y1,this->x2,this->y2,r->x,r->y,1) < 0) {
-            if ((r->deg + this->deg - 360) > 0)
-                r->deg = (r->deg + this->deg - 360);
-            else
-                r->deg = r->deg + this->deg;
-        }
-        else {
-            
-            r->deg = r->deg + this->deg;
-        }
+      
         
-        r->x = p->x;
-        r->y = p->y;
+        r->x = p->x * cos (this->deg * PI / 180) + p->y * sin (this->deg * PI / 180) ;
+        r->y = p->y * cos (this->deg * PI / 180) - p->x * sin (this->deg * PI / 180);
+        cout << "r->deg = " << r->deg << "\n";
+        r->deg = r->deg + this->deg;
+        if (r->deg > 360)
+            r->deg = r->deg - 360;
+        
     }
     const char *getID() const{
         return "Lens";
@@ -621,7 +867,6 @@ public:
         cout << "Destructure of the Lens" << "\n";
     }
 };
-
 
 
 class Lens_wide : public Device{
