@@ -1325,76 +1325,183 @@ public:
                 return NULL;
         }
 
-    void change_direction(RAY *r, point *p) const                       //      Призма
+    void change_direction(RAY *r, point *p) const			//	Ïðèçìà
+
     {
-                std::cout << "\nPrev r->deg: " << r->deg << "\n";       //      исходный угол луча
-                std::cout << "Point_in:   x: " << p->x << " y: " << p->y << " \n";
-                std::cout << "Coeff n : " << n_coeff << " \n";
-                float cos_a = 0;
-                Gran *gran = FindGran(p);
 
-                point *r0 = new point();
-                r0->x = r->x;
-                r0->y = r->y;
+		point *r0 = new point();
 
-                cos_a = Scalar(SubVect(p, r0), gran->normal) / (LenVect(p, r0) * sqrt(Sqr(gran->normal->x) + Sqr(gran->normal->y)));
-                float deg_f = RadToGrad(acos(cos_a));
-                std::cout << "Deg_in: " << deg_f << "\n";
-                while (fabs(deg_f) > 90 ) {
-                        deg_f = 180 - deg_f;
-                        std::cout << "Deg_in: " << deg_f << "  180-a \n";
-                }
-                float deg_r = RadToGrad(asin(sin(GradToRad(deg_f)) / n_coeff));
-                std::cout << "Deg_r_in: " << deg_r << "\n";
-                while (fabs(deg_r) > 90 ) {
-                        deg_r = 180 - deg_r;
-                        std::cout << "Deg_r_in: " << deg_r << "  180-a \n";
-                }
+		Gran *gran_in = NULL;
 
-                float deg_r_new = r->deg - deg_f + deg_r;
+		r0->x = r->x;
 
-                std::cout << "Deg_ray_new " << deg_r_new << "\n";
+		r0->y = r->y;
 
-                RAY *ray_in = new RAY;
-                ray_in->set_ray_pos (p->x, p->y, ray_in->Deg360(deg_r_new));
+		std::cout << "\nPrev r->deg: " << r->deg << "\n";	//	èñõîäíûé óãîë ëó÷à
 
-                point *p_new = cross_point(ray_in);                     //      выходная точка
-                if (p_new != NULL)
-                {
-                        Gran *gran_out = FindGran(p_new);
-                        std::cout << "\n        Point_out: x: " << p_new->x << " y: " << p_new->y << "\n";
+		std::cout << "Point_in:   x: " << p->x << " y: " << p->y << " \n";	
 
-                        cos_a = Scalar(SubVect(p_new, r0), gran_out->normal) / (LenVect(p_new, r0) * sqrt(Sqr(gran_out->normal->x) + Sqr(gran_out->normal->y)));
-                        float deg_r_out = RadToGrad(acos(cos_a));                                                       //      угол между лучом и выходной нормалью
-                        std::cout << "  Deg_r_out: " << deg_r_out << "\n";
-                        while (fabs(deg_r_out) > 90 ) {
-                                deg_r_out = 180 - deg_r_out;                    //      0..90
-                                std::cout << "  Deg_r_out: " << deg_r_out << "  180-a \n";
-                        }
-                        if (sin(GradToRad(deg_r_out)) * n_coeff > 1) {
-                                std::cout << "  sin(Deg_i_out) * n > 1: " << sin(GradToRad(deg_r_out)) * n_coeff << "\n";
-                                deg_r_out = 90 - deg_r_out;
-                        }
-                        float deg_i_out = RadToGrad(asin(sin(GradToRad(deg_r_out)) * n_coeff));         //      sin(i_out) = sin(r_out) * n
-                        std::cout << "  Deg_i_out: " << deg_i_out << "\n";
-                        while (fabs(deg_i_out) > 90 ) {
-                                deg_i_out = 180 - deg_i_out;                    //      0..90
-                                std::cout << "  Deg_i_out: " << deg_i_out << " 180-a \n";
-                        }
+		std::cout << "Coeff n : " << n_coeff << " \n";	
 
-                        float deg_i_out_new = ray_in->deg - deg_i_out + deg_r_out;
-                        std::cout << "Deg_i_out_new: " << deg_i_out_new << "\n";
+		float cos_a = 0;
 
-                        r->deg = r->Deg360(deg_i_out_new);
-                        r->x = p_new->x;
-                        r->y = p_new->y;
-                }
-		r->x = p->x;
-		r->y = p->y;
-                r->deg = r->Deg360(r->deg);                                                             //      угол луча в [0..360]
-                std::cout << "New r->deg: " << r->deg << "\n";
+		Gran *gran = FindGran(p);
+
+		if (gran == NULL) 
+
+		{
+
+			cout << "Point P out of prizm. x: " << p->x << " y:" << p->y << " \n";
+
+			return;
+
+		}
+
+		gran_in = FindGran(r0);
+
+		if (gran_in == NULL) {		//	Ïåðâûé ïðîõîä (ëó÷ èçâíå)
+
+			cout << "Prism first begin." << "\n";
+
+			cos_a = Scalar(SubVect(p, r0), gran->normal) / (LenVect(p, r0) * sqrt(Sqr(gran->normal->x) + Sqr(gran->normal->y)));
+
+			float deg_f = RadToGrad(acos(cos_a));
+
+			std::cout << "Deg_in: " << deg_f << "\n";
+
+			while (fabs(deg_f) > 90 ) {
+
+				deg_f = 180 - deg_f;
+
+				std::cout << "Deg_in: " << deg_f << "  180-a \n";
+
+			}
+
+			float deg_r = RadToGrad(asin(sin(GradToRad(deg_f)) / n_coeff));
+
+			std::cout << "Deg_r_in: " << deg_r << "\n";
+
+			while (fabs(deg_r) > 90 ) {
+
+				deg_r = 180 - deg_r;
+
+				std::cout << "Deg_r_in: " << deg_r << "  180-a \n";
+
+			}
+
+
+
+			float deg_r_new = r->deg - deg_f + deg_r;
+
+
+
+			std::cout << "Deg_ray_new " << deg_r_new << "\n";
+
+			r->deg = r->Deg360(deg_r_new);
+
+			r->x = p->x;
+
+			r->y = p->y;
+
+			std::cout << "Prism first: New r->deg: " << r->deg << " x: " << r->x << " y: "<< r->y <<"\n";
+
+
+
+			return;
+
+
+
+		}
+
+		else {		//	âòîðîé ïðîõîä ëó÷à
+
+			cout << "Prism second begin." << "\n";
+
+
+
+			//RAY *ray_in = new RAY;
+
+			//ray_in->set_ray_pos (p->x, p->y, ray_in->Deg360(deg_r_new));
+
+
+
+			//	point *p_new = cross_point(ray_in);			//	âûõîäíàÿ òî÷êà	
+
+															//	äîëæíà áûòü âûçâàíà ïîñëå ïåðâîãî âûçîâà change_direction
+
+			point *p_new = new point();
+
+			p_new->x = p->x;
+
+			p_new->y = p->y;
+
+			RAY *ray_in = r;
+
+			if (p_new != NULL)		//	òî÷êà âûõîäà óæå íàéäåíà âî âíåøíåì âûçîâå cross_point
+
+			{
+
+				Gran *gran_out = FindGran(p_new);
+
+				std::cout << "\n	Point_out: x: " << p_new->x << " y: " << p_new->y << "\n";
+
+
+
+				cos_a = Scalar(SubVect(p_new, r0), gran_out->normal) / (LenVect(p_new, r0) * sqrt(Sqr(gran_out->normal->x) + Sqr(gran_out->normal->y)));
+
+				float deg_r_out = RadToGrad(acos(cos_a));							//	óãîë ìåæäó ëó÷îì è âûõîäíîé íîðìàëüþ
+
+				std::cout << "	Deg_r_out: " << deg_r_out << "\n";
+
+				while (fabs(deg_r_out) > 90 ) {
+
+					deg_r_out = 180 - deg_r_out;			//	0..90
+
+					std::cout << "	Deg_r_out: " << deg_r_out << "  180-a \n";
+
+				}
+
+				if (sin(GradToRad(deg_r_out)) * n_coeff > 1) {
+
+					std::cout << "	sin(Deg_i_out) * n > 1: " << sin(GradToRad(deg_r_out)) * n_coeff << "\n";
+
+					deg_r_out = 90 - deg_r_out;
+
+				}
+
+				float deg_i_out = RadToGrad(asin(sin(GradToRad(deg_r_out)) * n_coeff));		//	sin(i_out) = sin(r_out) * n
+
+				std::cout << "	Deg_i_out: " << deg_i_out << "\n";
+
+				while (fabs(deg_i_out) > 90 ) {
+
+					deg_i_out = 180 - deg_i_out;			//	0..90
+
+					std::cout << "	Deg_i_out: " << deg_i_out << " 180-a \n";
+
+				}
+
+
+
+				float deg_i_out_new = ray_in->deg - deg_i_out + deg_r_out;
+
+				std::cout << "Deg_i_out_new: " << deg_i_out_new << "\n";
+
+
+
+				r->deg = r->Deg360(deg_i_out_new);
+
+				r->x = p_new->x;
+
+				r->y = p_new->y;
+
+				std::cout << "Prism second: New r->deg: " << r->deg << " x: " << r->x << " y: " <<r->y << "\n";
+
+			}
+
+		}
+
     }
-
 
     const char *getID() const {
         return "Prism";
