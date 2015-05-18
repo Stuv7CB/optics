@@ -237,6 +237,18 @@ for(int I=0; I<my_laser_ray.size(); I++)
                     		}
                     	recv(cs, temp, 1, 0);
                 	}
+			if (my_device[num]->getID()==5){
+	                        cross = my_device[num]->cross_point(my_laser_ray[I]);
+        	                sprintf(buf_, "%f %f %f %f %c", my_laser_ray[I]->x, my_laser_ray[I]->y, cross->x, cross->y, '\0');//new dot
+                	        if(send(cs, buf_, strlen(buf_)+1, MSG_NOSIGNAL)==-1){
+                        		perror("Can't send:");
+                        		return NULL;
+                        	}
+                        	recv(cs, temp, 1, 0);
+                        	float tx=cross->x;
+                        	float ty=cross->y;
+                        	my_device[num]->change_direction(my_laser_ray[I], cross);
+			}
 		}
 		else{
 			break;
