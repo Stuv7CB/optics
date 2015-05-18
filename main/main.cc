@@ -161,7 +161,7 @@ int cs=*(int *)arg;
 				{
                                 float a1, x, y, r0, deg_1, deg_2;
                                 sscanf(buf, "%f %f %f %f %f %f",&a1, &x, &y, &deg_1, &deg_2, &r0);
-				Device  *d = new SphereRefl(x, y, r0, deg_1-90, deg_2-90);
+				Device  *d = new SphereRefl(x, y, r0, deg_1, deg_2);
                                 my_device.push_back(d);
                                 printf("New sphere mirror was created\n");
 				break;
