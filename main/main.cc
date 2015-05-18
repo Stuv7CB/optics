@@ -46,7 +46,7 @@ int main()
         while(1)
         {
     	struct sockaddr_in remote;
-    	unsigned remoteLen=sizeof(remote);
+    	int remoteLen=sizeof(remote);
         int cs;
     	if((cs=accept(h, (sockaddr *)&remote, &remoteLen))<0){
         	perror("Accepting");
