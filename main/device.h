@@ -1074,72 +1074,167 @@ class SphereRefl        :       public Device {
                 std::cout << "X1:" << x1 << " Y1: " << y1 << " X2: " << x2 << " Y2: " << y2 << "\n";
     }
 
-        point *cross_point(RAY *r) const {                                      //      точка пересечения сферы и луча
+
+    point *cross_point(RAY *r) const {					//	òî÷êà ïåðåñå÷åíèÿ ñôåðû è ëó÷à
+
         point *p = new point();
 
-                float xn, yn, k_ray, b_ray;
-                float xc, yc;
-                if (r->deg != 0) {
-                        xn = r->y / tan (GradToRad(r->deg)) + r->x;
-                        yn = r->x * tan (GradToRad(r->deg)) + r->y;
+		point *p1 = new point();
 
-                        k_ray = -yn/xn;                                                                                                                         //      уравнение луча
-                        b_ray = yn;
-                                                                                                                                                                        //      пересечение луча и нормали, проходящей через центр сферы
-                        xc = (OptC->y - OptC->x/k_ray - yn) / (k_ray + 1/k_ray);                        //      k_ray = 0 ?
-                        yc = -(xc + OptC->x)/ k_ray + OptC->y;
-                } else {
-                        xc = OptC->x;
-                        yc = r->y;
-                }
-                point pc;
-                pc.x = xc;
-                pc.y = yc;
-                point p_ray;
-                p_ray.x = r->x;
-                p_ray.y = r->y;
-                float l_ray_optc = LenVect(&p_ray, OptC);
-                float l_ray_pc = LenVect(&p_ray, &pc);
-                float l_d = sqrt(l_ray_optc * l_ray_optc - l_ray_pc * l_ray_pc);
-                float l_ray;
-                if (this->R >= l_d) {
-                        l_ray = fabs(l_ray_pc - sqrt(R * R - l_d * l_d));
-                        p->x = r->x + l_ray * cos(GradToRad(r->deg));
-                        p->y = r->y - l_ray * sin(GradToRad(r->deg));
+		point *p2 = new point();
 
-                        float delta = Sqr(p->x - OptC->x) + Sqr(p->y - OptC->y) - Sqr(R);
-                        std::cout << "1) p->x: " << p->x << " p->y: " << p->y << " r->deg: " << r->deg << " delta:" << delta << "\n";
-                        //      Проверка принадлежности сегменту
-                        //      Находим угол от вертикали
-                        float deg_t;
-                        if (fabs(delta) < 0.1) {
-                                deg_t  = RadToGrad(atan((OptC->x - p->x) / (OptC->y - p->y)));
-				if (OptC->x - p->x < 0) deg_t += 180;
-                                deg_t = r->Deg360(deg_t);
+		float aa, bb, cc, dd;
 
-                                std::cout << "Sphere Point 1: x=" << p->x << " y=" << p->y << " Sphere Deg=" << deg_t << " deg1=" << deg1 << " deg2=" << deg2 << "\n";
-                                if (deg1 <= deg_t && deg_t <= deg2 ) return p;
-                        }
 
-                        //      Второй корень
-                        l_ray = fabs(l_ray_pc + sqrt(R * R - l_d * l_d));
-                        p->x = r->x + l_ray * cos(GradToRad(r->deg));
-                        p->y = r->y - l_ray * sin(GradToRad(r->deg));
 
-                        delta = Sqr(p->x - OptC->x) + Sqr(p->y - OptC->y) - Sqr(R);
-                        std::cout << "2) p->x: " << p->x << " p->y: " << p->y << " r->deg: " << r->deg << " delta:" << delta << "\n";
+		float xn, yn, k_ray, b_ray;
 
-                        if (fabs(delta) < 0.1) {
-                                deg_t  = RadToGrad(atan((OptC->x - p->x) / (OptC->y - p->y)));
-                                deg_t = r->Deg360(deg_t);
+		float xc, yc;
 
-                                std::cout << "Sphere Point 2: x=" << p->x << " y=" << p->y << " Sphere Deg=" << deg_t << " deg1=" << deg1 << " deg2=" << deg2 << "\n";
-                                if (deg1 <= deg_t && deg_t <= deg2 ) return p;
-                        }
-                }
+
+
+		if (r->deg == 90 || r->deg == 270) 
+
+		{
+
+			dd = Sqr(R) - Sqr(r->x - OptC->x);
+
+			if (dd < 0) return NULL;
+
+			p1->y = OptC->y + sqrt(dd);
+
+			p2->y = OptC->y - sqrt(dd);
+
+			p1->x = r->x;
+
+			p2->x = r->x;
+
+		} else
+
+
+
+		if (r->deg == 0 || r->deg == 360 || r->deg == 180) 
+
+		{
+
+			dd = Sqr(R) - Sqr(r->y - OptC->y);
+
+			if (dd < 0) return NULL;
+
+			p1->x = OptC->x + sqrt(dd);
+
+			p2->x = OptC->x - sqrt(dd);
+
+			p1->y = r->y;
+
+			p2->y = r->y;
+
+		} else 
+
+
+
+		{
+
+			xn = r->y / tan (GradToRad(r->deg)) + r->x;
+
+			yn = r->x * tan (GradToRad(r->deg)) + r->y;
+
+
+
+
+
+			aa = 1.0 + Sqr(xn/yn);
+
+			bb = 2.0 * (xn * OptC->x / yn - OptC->y - Sqr(xn)/ yn);
+
+			cc = Sqr(xn - OptC->x) + Sqr(OptC->y) - Sqr(this->R);
+
+
+
+			dd = Sqr(bb) - 4 * aa * cc;
+
+			if (dd < 0) return NULL;				//	êîðíåé íåò 
+
+			dd = sqrt(dd);
+
+
+
+			p1->y = (-bb + dd) / (2 * aa);			//	êîðíè ïåðåñå÷åíèé
+
+			p2->y = (-bb - dd) / (2 * aa);
+
+			p1->x = (1.0 - p1->y/yn) * xn;
+
+			p2->x = (1.0 - p2->y/yn) * xn;
+
+		}
+
+			float delta1 = Sqr(p1->x - OptC->x) + Sqr(p1->y - OptC->y) - Sqr(R);
+
+			float delta2 = Sqr(p2->x - OptC->x) + Sqr(p2->y - OptC->y) - Sqr(R);
+
+			std::cout << "1) p1->x: " << p1->x << " p1->y: " << p1->y << " r->deg: " << r->deg << " delta1:" << delta1 << "\n";
+
+			std::cout << "2) p2->x: " << p2->x << " p2->y: " << p2->y << " r->deg: " << r->deg << " delta2:" << delta2 << "\n";
+
+			float p1_deg  = RadToGrad(acos((OptC->y - p1->y) / this->R));
+
+			if (p1->x - OptC->x > 0) p1_deg = 360 - p1_deg;
+
+			float p2_deg  = RadToGrad(acos((OptC->y - p2->y) / this->R));
+
+			if (p2->x - OptC->x > 0) p2_deg = 360 - p2_deg;
+
+			//if (fabs(delta1) < 0.1) {
+
+				
+
+			
+
+		if (ceil(p1_deg) >= deg1 && floor(p1_deg) <= deg2 /*&& delta1 < 0.1*/) {					//	ëåæèò â ñåãìåíòå ñôåðû
+
+			if (r->CheckRayPoint(p1)) {		//		Ïðîâåðêà ëó÷à (òî÷êà íàõîäèòñÿ íà ëó÷å)
+
+				p->x = p1->x; 
+
+				p->y = p1->y;
+
+				std::cout << "Sphere intersection 1\n";
+
+				std::cout << "p1->x: " << p1->x << " p1->y: " << p1->y << " r->deg: " << r->deg << "\n";
+
+				return p;
+
+			}
+
+		}
+
+		if (ceil(p2_deg) >= deg1 && floor(p2_deg) <= deg2 /*&& delta2 < 0.1*/) {					//	ëåæèò â ñåãìåíòå ýëëèïñà
+
+			if (r->CheckRayPoint(p2)) {		//		Ïðîâåðêà ëó÷à (òî÷êà íàõîäèòñÿ íà ëó÷å)
+
+				p->x = p2->x; 
+
+				p->y = p2->y;
+
+				std::cout << "Sphere intersection 2\n";
+
+				std::cout << "p2->x: " << p2->x << " p2->y: " << p2->y << " r->deg: " << r->deg << "\n";
+
+				return p;
+
+			}
+
+		}
+
+
+
+
 
         return NULL;
+
     }
+
 
     void change_direction(RAY *r, point *p) const                       //      Сферическое зеркало
     {
