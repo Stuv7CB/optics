@@ -1510,7 +1510,20 @@ public:
         return NULL;
     }
 
-        Gran *FindGran(point *pp) const
+Gran *FindGran(point *pp) const{ 
+	float cos_a = 0;
+	for (int i=0; i < gran_vect.size(); i++){ 
+		cos_a = gran_vect[i]->CheckPointCosA(pp); 
+		if (fabs(cos_a + 1) < 1e-4) { 
+			return gran_vect[i]; 
+			break; 
+		}
+	} 
+	return NULL; 
+}
+
+
+/*        Gran *FindGran(point *pp) const
         {
                 float cos_a = 0;
                 for (int i=0; i < gran_vect.size(); i++) {                      //      нашли грань для точки p
@@ -1522,7 +1535,7 @@ public:
                         }
                 }
                 return NULL;
-        }
+        }*/
 
     void change_direction(RAY *r, point *p) const			//	Ïðèçìà
 
