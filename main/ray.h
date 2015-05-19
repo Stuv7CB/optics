@@ -6,7 +6,7 @@
 using namespace std;
 
 #define PI 3.14159265
-#define NUMBER 10            // HERE YOU CAN CHANGE NUMBER OF CREATED RAYS {360 : (NUMBBER - 1)}
+#define NUMBER 37            // HERE YOU CAN CHANGE NUMBER OF CREATED RAYS {360 : (NUMBBER - 1)}
 
 
 struct point  {
@@ -83,10 +83,11 @@ class RAY                                                                       
 public:
     float x, y;                                                                                                                         //      координаты
     float deg;                                                                                                                          //      угол
-
+    int TTL;
+    point *lastCross;
 public:
     void set_ray_pos (float x_0, float y_0, float deg_0)                                        //      установка параметров x,y,deg
-    { x = x_0; y = y_0; deg = deg_0;}
+    { x = x_0; y = y_0; deg = deg_0; TTL=0;}
 
         bool CheckRayPoint(point *pp) const
         {
